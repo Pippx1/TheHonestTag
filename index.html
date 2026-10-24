@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Follow a garment from field to bin and see its honest environmental tag build up: carbon, water and microplastics at every stage.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M14 22 L32 8 L50 22 V52 a4 4 0 0 1 -4 4 H18 a4 4 0 0 1 -4 -4 Z%27 stroke=%2314181F stroke-width=%275%27/%3E%3Ccircle cx=%2732%27 cy=%2722%27 r=%275%27 stroke=%23C8571F stroke-width=%275%27/%3E%3Cpath d=%27M24 38 H40 M24 46 H34%27 stroke=%2314181F stroke-width=%275%27/%3E%3C/svg%3E">
+<title>The Honest Tag</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F3F0; --card:#FFFFFF; --ink:#14181F; --muted:#59606B; --rule:#D5D8D2; --soft:#E7E9E4;
+  --accent:#2F4B63; --thread:#C8571F; --good:#2E7D5B; --bad:#B4432A;
+  --s-raw:#A9BCCB; --s-yarn:#8EA6BA; --s-wet:#5F7F9A; --s-asm:#2F4B63; --s-fr:#C9952B; --s-use:#4F9D8A; --s-eol:#8C6A9E;
+  --label:#FBFAF6; --shadow:0 18px 40px -22px rgba(20,24,31,.35);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0F1217; --card:#171B22; --ink:#ECEEF0; --muted:#A5ACB6; --rule:#2B313B; --soft:#1E232B;
+  --accent:#8DB6D6; --thread:#E07A43; --good:#5CC093; --bad:#E7765C; --label:#1A1E25; --shadow:0 18px 40px -22px rgba(0,0,0,.8); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0F1217; --card:#171B22; --ink:#ECEEF0; --muted:#A5ACB6; --rule:#2B313B; --soft:#1E232B;
+  --accent:#8DB6D6; --thread:#E07A43; --good:#5CC093; --bad:#E7765C; --label:#1A1E25; --shadow:0 18px 40px -22px rgba(0,0,0,.8); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Archivo,system-ui,-apple-system,"Segoe UI",sans-serif;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--thread);outline-offset:2px}
+.num{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1120px;margin:0 auto;padding-block:18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;text-decoration:none;color:var(--ink)}
+.brand svg{width:24px;height:24px}
+.proto{font-size:13px;color:var(--muted)}
+.shell{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:56px;align-items:start;padding-bottom:120px}
+
+/* hero: the care label */
+.hero{padding-block:40px 24px;max-width:620px}
+.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.02;letter-spacing:-.03em;font-weight:800;margin:0 0 16px;text-wrap:balance}
+.hero p{font-size:18px;color:var(--muted);margin:0 0 28px;max-width:52ch}
+.care{position:relative;background:var(--label);border-radius:4px;padding:26px 24px 22px;box-shadow:var(--shadow);
+  outline:1px dashed color-mix(in srgb,var(--muted) 45%,transparent);outline-offset:-9px}
+.care::before,.care::after{content:"";position:absolute;left:24px;right:24px;height:0;border-top:1px dashed color-mix(in srgb,var(--muted) 35%,transparent)}
+.care::before{top:0;display:none}
+.care label{display:block;font-weight:600;font-size:14px;margin-bottom:8px}
+.care textarea{width:100%;min-height:86px;resize:vertical;border:0;background:transparent;font:500 19px/1.5 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.01em;padding:0;outline:none}
+.care textarea::placeholder{color:color-mix(in srgb,var(--muted) 70%,transparent)}
+.care .hint{font-size:13px;color:var(--muted);margin-top:6px}
+.examples{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.examples button{border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.examples button:hover{border-color:var(--ink)}
+.read{margin-top:22px;display:flex;flex-direction:column;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:34px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:6px;padding:5px 10px;font-size:14px;background:var(--soft)}
+.chip.ok{background:color-mix(in srgb,var(--good) 14%,transparent)}
+.chip.guess{background:transparent;border:1px dashed var(--rule)}
+.chip b{font-weight:700}
+.miss{font-size:14px;color:var(--bad)}
+.garments{display:flex;flex-wrap:wrap;gap:6px}
+.garments button{border:1px solid var(--rule);background:var(--card);border-radius:8px;padding:6px 11px;font-size:14px;cursor:pointer}
+.garments button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.go{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:10px;background:var(--ink);color:var(--paper);padding:13px 20px;font-weight:700;cursor:pointer;font-size:16px}
+.go:disabled{opacity:.4;cursor:not-allowed}
+.small{font-size:14px;color:var(--muted)}
+
+/* journey with the thread */
+.journey{position:relative;padding-left:44px;margin-top:40px}
+.journey[hidden]{display:none}
+.thread{position:absolute;left:13px;top:0;bottom:0;width:2px;background-image:repeating-linear-gradient(to bottom,var(--rule) 0 9px,transparent 9px 15px)}
+.thread i{position:absolute;inset:0 0 auto 0;height:0;background-image:repeating-linear-gradient(to bottom,var(--thread) 0 9px,transparent 9px 15px);transition:height .25s linear}
+.needle{position:absolute;left:7px;width:14px;height:14px;border-radius:50%;background:var(--thread);box-shadow:0 0 0 4px color-mix(in srgb,var(--thread) 22%,transparent);transition:top .25s linear}
+.stop{position:relative;padding-block:24px 64px;min-height:62vh}
+.stop:last-child{min-height:0}
+.knot{position:absolute;left:-38px;top:32px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--rule);transition:border-color .2s,background .2s}
+.stop.reached .knot{border-color:var(--thread);background:var(--thread)}
+.where{font-size:14px;color:var(--muted);margin:0 0 4px}
+.stop h2{font-size:clamp(26px,3.6vw,36px);line-height:1.1;letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
+.stop .lede{font-size:18px;max-width:54ch;margin:0 0 22px}
+.big{font-weight:700}
+.panel{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:18px}
+.panel h3{font-size:15px;margin:0 0 4px}
+.panel .small{margin:0 0 12px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--rule);background:var(--paper);border-radius:10px;padding:10px 12px;cursor:pointer;min-width:0}
+.opt:hover{border-color:var(--ink)}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--card)}
+.opt:disabled{opacity:.45;cursor:not-allowed}
+.opt .n{font-weight:600;font-size:14px}
+.opt .d{font-size:13px}
+.d.up{color:var(--bad)} .d.down{color:var(--good)} .d.same{color:var(--muted)}
+.slider{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.slider input[type=range]{flex:1;min-width:180px;accent-color:var(--ink)}
+.slider output{font-weight:700;min-width:90px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:15px;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--ink)}
+.facts{display:flex;flex-wrap:wrap;gap:22px;margin-top:14px}
+.fact .v{font-size:22px;font-weight:700}
+.fact .l{font-size:13px;color:var(--muted)}
+.curve{width:100%;height:120px;margin-top:10px;display:block}
+.callout{border-left:3px solid var(--thread);padding:4px 0 4px 14px;margin-top:16px;max-width:56ch}
+.finale .lever{font-size:20px;max-width:46ch}
+.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.ghost{display:inline-flex;align-items:center;border:1px solid var(--ink);border-radius:10px;padding:12px 18px;font-weight:700;text-decoration:none;color:var(--ink);background:transparent;cursor:pointer}
+
+/* the hang tag */
+.tagcol{position:sticky;top:20px;padding-top:40px}
+.hang{position:relative;padding-top:46px}
+.hang svg.loop{position:absolute;left:50%;top:0;transform:translateX(-50%);width:70px;height:60px}
+.tag{position:relative;background:var(--label);border:2px solid var(--ink);border-radius:14px 14px 10px 10px;padding:26px 20px 18px;box-shadow:var(--shadow)}
+.tag .hole{position:absolute;left:50%;top:12px;width:14px;height:14px;margin-left:-7px;border:2px solid var(--ink);border-radius:50%;background:var(--paper)}
+.tag h4{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:10px 0 8px;line-height:1}
+.tag .bar0{height:6px;background:var(--ink);margin-bottom:12px}
+.tag .who{font-weight:700;font-size:16px}
+.tag .whosub{font-size:13px;color:var(--muted);margin-bottom:12px}
+.total{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;position:relative}
+.total .v{font-size:44px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.total .u{font-size:15px;color:var(--muted)}
+.delta{font-size:13px;font-weight:700;padding:2px 7px;border-radius:5px;opacity:0;transition:opacity .2s}
+.delta.show{opacity:1}
+.delta.up{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.delta.down{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.sbar{display:flex;height:14px;border-radius:3px;overflow:hidden;margin:12px 0 10px;background:repeating-linear-gradient(90deg,var(--soft) 0 6px,transparent 6px 9px)}
+.sbar span{display:block;height:100%;transition:width .35s ease}
+.rows{list-style:none;margin:0;padding:0;font-size:14px}
+.rows li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dotted var(--rule)}
+.rows li:last-child{border-bottom:0}
+.rows .k{display:flex;align-items:center;gap:8px}
+.rows .k i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.rows li.todo{color:var(--muted)}
+.rows li.todo .v{letter-spacing:.2em}
+.rows li.now{font-weight:700}
+.minor{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:10px;border-top:2px solid var(--ink);font-size:14px}
+.minor div{display:flex;flex-direction:column}
+.minor .v{font-weight:700;font-size:16px}
+.tag .foot{font-size:12px;color:var(--muted);margin-top:10px}
+.sheetbtn{display:none}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  .tagcol{position:fixed;left:0;right:0;bottom:0;top:auto;padding:0;z-index:20;pointer-events:none;display:flex;flex-direction:column}
+  .sheetbtn{order:2}
+  .tagcol .hang{display:none;pointer-events:auto;max-height:78vh;overflow:auto;padding:46px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));background:var(--paper);border-top:1px solid var(--rule)}
+  .tagcol.open .hang{display:block}
+  .sheetbtn{pointer-events:auto;display:flex;align-items:center;gap:12px;width:100%;border:0;border-top:2px solid var(--ink);background:var(--label);padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));cursor:pointer;text-align:left}
+  .sheetbtn .v{font-size:22px;font-weight:800}
+  .sheetbtn .mini{flex:1;display:flex;height:10px;border-radius:2px;overflow:hidden;background:var(--soft);min-width:60px}
+  .sheetbtn .mini span{height:100%}
+  .sheetbtn .lab{font-size:13px;color:var(--muted)}
+  .journey{padding-left:34px}
+  .thread{left:8px} .needle{left:2px} .knot{left:-32px}
+  .stop{min-height:0;padding-block:20px 56px}
+  body{padding-bottom:70px}
+}
+.lede .num,.lever .num,.total .v,.sheetbtn .v,.fact .v{font-family:inherit;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:4px;background:var(--soft);border-radius:10px;padding:4px}
+.tabs button{border:0;background:transparent;border-radius:7px;padding:7px 13px;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(20,24,31,.12)}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:4px}
+.pick{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--rule);background:var(--card);border-radius:10px;padding:11px 13px;cursor:pointer;min-width:0}
+.pick:hover{border-color:var(--ink)}
+.pick[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pick .n{font-weight:700}
+.pick .d{font-size:13px;opacity:.75}
+.textlink{border:0;background:none;padding:0;color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-weight:600;cursor:pointer}
+body[data-view="read"] .tagcol,body[data-view="read"] #journey,body[data-view="read"] #v-follow{display:none}
+body[data-view="read"] .shell{grid-template-columns:minmax(0,1fr)}
+body[data-view="follow"] #v-read{display:none}
+@media (max-width:520px){.brand span{display:none}}
+@media (max-width:900px){.tagcol:not(.live){display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+<style>[hidden]{display:none!important}img{max-width:100%}body{-webkit-text-size-adjust:100%}</style>
+<!-- Cookie consent: CookieConsent v3.1.0 (MIT, github.com/orestbida/cookieconsent), inlined. -->
+<style id="cc-css">#cc-main{background:transparent;color:var(--cc-primary-color);font-family:var(--cc-font-family);font-size:16px;font-weight:400;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;line-height:1.15;position:relative;text-rendering:optimizeLegibility;-webkit-text-size-adjust:100%;position:fixed;z-index:var(--cc-z-index)}#cc-main :after,#cc-main :before,#cc-main a,#cc-main button,#cc-main div,#cc-main h2,#cc-main input,#cc-main p,#cc-main span{all:unset;box-sizing:border-box}#cc-main .pm__badge,#cc-main button{all:initial;box-sizing:border-box;color:unset;visibility:unset}#cc-main .pm__badge,#cc-main a,#cc-main button,#cc-main input{-webkit-appearance:none;appearance:none;cursor:pointer;font-family:inherit;font-size:100%;line-height:normal;margin:0;outline:revert;outline-offset:2px;overflow:hidden}#cc-main table,#cc-main tbody,#cc-main td,#cc-main th,#cc-main thead,#cc-main tr{all:revert;color:inherit;font-family:inherit;font-size:inherit;font-weight:inherit}:root{--cc-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";--cc-modal-border-radius:.5rem;--cc-btn-border-radius:.4rem;--cc-modal-transition-duration:.25s;--cc-link-color:var(--cc-btn-primary-bg);--cc-modal-margin:1rem;--cc-z-index:2147483647;--cc-bg:#fff;--cc-primary-color:#2c2f31;--cc-secondary-color:#5e6266;--cc-btn-primary-bg:#30363c;--cc-btn-primary-color:#fff;--cc-btn-primary-border-color:var(--cc-btn-primary-bg);--cc-btn-primary-hover-bg:#000;--cc-btn-primary-hover-color:#fff;--cc-btn-primary-hover-border-color:var(--cc-btn-primary-hover-bg);--cc-btn-secondary-bg:#eaeff2;--cc-btn-secondary-color:var(--cc-primary-color);--cc-btn-secondary-border-color:var(--cc-btn-secondary-bg);--cc-btn-secondary-hover-bg:#d4dae0;--cc-btn-secondary-hover-color:#000;--cc-btn-secondary-hover-border-color:#d4dae0;--cc-separator-border-color:#f0f4f7;--cc-toggle-on-bg:var(--cc-btn-primary-bg);--cc-toggle-off-bg:#667481;--cc-toggle-on-knob-bg:#fff;--cc-toggle-off-knob-bg:var(--cc-toggle-on-knob-bg);--cc-toggle-enabled-icon-color:var(--cc-bg);--cc-toggle-disabled-icon-color:var(--cc-bg);--cc-toggle-readonly-bg:#d5dee2;--cc-toggle-readonly-knob-bg:#fff;--cc-toggle-readonly-knob-icon-color:var(--cc-toggle-readonly-bg);--cc-section-category-border:var(--cc-cookie-category-block-bg);--cc-cookie-category-block-bg:#f0f4f7;--cc-cookie-category-block-border:#f0f4f7;--cc-cookie-category-block-hover-bg:#e9eff4;--cc-cookie-category-block-hover-border:#e9eff4;--cc-cookie-category-expanded-block-bg:transparent;--cc-cookie-category-expanded-block-hover-bg:#dee4e9;--cc-overlay-bg:rgba(0,0,0,.65);--cc-webkit-scrollbar-bg:var(--cc-section-category-border);--cc-webkit-scrollbar-hover-bg:var(--cc-btn-primary-hover-bg);--cc-footer-bg:var(--cc-btn-secondary-bg);--cc-footer-color:var(--cc-secondary-color);--cc-footer-border-color:#e4eaed;--cc-pm-toggle-border-radius:4em}#cc-main.cc--rtl{direction:rtl}#cc-main .cm__title,#cc-main a,#cc-main b,#cc-main em,#cc-main strong{font-weight:600}#cc-main button>span{pointer-events:none}#cc-main .cc__link,#cc-main a{background-image:linear-gradient(currentColor,currentColor);background-position:0 100%;background-repeat:no-repeat;background-size:0 1px;font-weight:600;position:relative;transition:background-size .25s,color .25s ease}#cc-main .cc__link:hover,#cc-main a:hover{background-size:100% 1px;color:var(--cc-primary-color)}#cc-main .cc__link{color:var(--cc-link-color)}#cc-main .cm__desc,#cc-main .pm__body{overscroll-behavior:auto contain;scrollbar-width:thin}@media screen and (min-width:640px){#cc-main ::-webkit-scrollbar,#cc-main ::-webkit-scrollbar-thumb,#cc-main ::-webkit-scrollbar-track{all:revert}#cc-main ::-webkit-scrollbar-thumb{-webkit-background-clip:padding-box;background-clip:padding-box;background:var(--cc-toggle-readonly-bg);border:.25rem solid var(--cc-bg);border-radius:1rem}#cc-main ::-webkit-scrollbar-thumb:hover{background:var(--cc-toggle-off-bg)}#cc-main ::-webkit-scrollbar{background:transparent;width:12px}}html.disable--interaction.show--consent,html.disable--interaction.show--consent body{height:auto!important;overflow:hidden!important}@media (prefers-reduced-motion){#cc-main{--cc-modal-transition-duration:0s}}.cc--darkmode{--cc-bg:#161a1c;--cc-primary-color:#ebf3f6;--cc-secondary-color:#aebbc5;--cc-btn-primary-bg:#c2d0e0;--cc-btn-primary-color:var(--cc-bg);--cc-btn-primary-border-color:var(--cc-btn-primary-bg);--cc-btn-primary-hover-bg:#98a7b6;--cc-btn-primary-hover-color:#000;--cc-btn-primary-hover-border-color:var(--cc-btn-primary-hover-bg);--cc-btn-secondary-bg:#242c31;--cc-btn-secondary-color:var(--cc-primary-color);--cc-btn-secondary-border-color:var(--cc-btn-secondary-bg);--cc-btn-secondary-hover-bg:#353d43;--cc-btn-secondary-hover-color:#fff;--cc-btn-secondary-hover-border-color:var(--cc-btn-secondary-hover-bg);--cc-separator-border-color:#222a30;--cc-toggle-on-bg:var(--cc-btn-primary-bg);--cc-toggle-off-bg:#525f6b;--cc-toggle-on-knob-bg:var(--cc-btn-primary-color);--cc-toggle-off-knob-bg:var(--cc-btn-primary-color);--cc-toggle-enabled-icon-color:var(--cc-btn-primary-color);--cc-toggle-disabled-icon-color:var(--cc-btn-primary-color);--cc-toggle-readonly-bg:#343e45;--cc-toggle-readonly-knob-bg:#5f6b72;--cc-toggle-readonly-knob-icon-color:var(--cc-toggle-readonly-bg);--cc-section-category-border:#1e2428;--cc-cookie-category-block-bg:#1e2428;--cc-cookie-category-block-border:var(--cc-section-category-border);--cc-cookie-category-block-hover-bg:#242c31;--cc-cookie-category-block-hover-border:#232a2f;--cc-cookie-category-expanded-block-bg:transparent;--cc-cookie-category-expanded-block-hover-bg:var(--cc-toggle-readonly-bg);--cc-overlay-bg:rgba(0,0,0,.65);--cc-webkit-scrollbar-bg:var(--cc-section-category-border);--cc-webkit-scrollbar-hover-bg:var(--cc-btn-primary-hover-bg);--cc-footer-bg:#0c0e0f;--cc-footer-color:var(--cc-secondary-color);--cc-footer-border-color:#060809}.cc--darkmode #cc-main{color-scheme:dark}#cc-main .cm{background:var(--cc-bg);border-radius:var(--cc-modal-border-radius);box-shadow:0 .625em 1.875em rgba(0,0,2,.3);display:flex;flex-direction:column;max-width:24rem;opacity:0;overflow:hidden;position:fixed;transform:translateY(1.6em);visibility:hidden;z-index:1}#cc-main .cm--top{top:var(--cc-modal-margin)}#cc-main .cm--middle{top:50%;transform:translateY(calc(-50% + 1.6em))}#cc-main .cm--bottom{bottom:var(--cc-modal-margin)}#cc-main .cm--center{left:var(--cc-modal-margin);margin:0 auto;right:var(--cc-modal-margin);width:unset}#cc-main .cm--left{left:var(--cc-modal-margin);margin-right:var(--cc-modal-margin)}#cc-main .cm--right{margin-left:var(--cc-modal-margin);right:var(--cc-modal-margin)}#cc-main .cm__body{display:flex;flex-direction:column;justify-content:space-between;position:relative}#cc-main .cm__btns,#cc-main .cm__links{padding:1rem 1.3rem;width:unset}#cc-main .cm__texts{display:flex;flex:1;flex-direction:column;justify-content:center;padding:1rem 0 0}#cc-main .cm__desc,#cc-main .cm__title{padding:0 1.3rem}#cc-main .cm__title{font-size:1.05em}#cc-main .cm__title+.cm__desc{margin-top:1.1em}#cc-main .cm__desc{color:var(--cc-secondary-color);font-size:.9em;line-height:1.5;max-height:40vh;overflow-x:visible;overflow-y:auto;padding-bottom:1em}#cc-main .cm__btns{border-top:1px solid var(--cc-separator-border-color);display:flex;flex-direction:column;justify-content:center}#cc-main .cm__btn-group{display:grid;grid-auto-columns:minmax(0,1fr)}#cc-main .cm__btn+.cm__btn,#cc-main .cm__btn-group+.cm__btn-group{margin-top:.375rem}#cc-main .cm--flip .cm__btn+.cm__btn,#cc-main .cm--flip .cm__btn-group+.cm__btn-group{margin-bottom:.375rem;margin-top:0}#cc-main .cm--inline .cm__btn+.cm__btn{margin-left:.375rem;margin-top:0}#cc-main .cm--inline.cm--flip .cm__btn+.cm__btn{margin-bottom:0;margin-left:0;margin-right:.375rem}#cc-main .cm--inline.cm--flip .cm__btn-group+.cm__btn-group{margin-bottom:.375rem;margin-right:0}#cc-main .cm--wide .cm__btn+.cm__btn,#cc-main .cm--wide .cm__btn-group+.cm__btn-group{margin-left:.375rem;margin-top:0}#cc-main .cm--wide.cm--flip .cm__btn+.cm__btn,#cc-main .cm--wide.cm--flip .cm__btn-group+.cm__btn-group{margin-bottom:0;margin-right:.375rem}#cc-main .cm--bar:not(.cm--inline) .cm__btn-group--uneven,#cc-main .cm--wide .cm__btn-group--uneven{display:flex;flex:1;justify-content:space-between}#cc-main .cm--bar:not(.cm--inline).cm--flip .cm__btn-group--uneven,#cc-main .cm--wide.cm--flip .cm__btn-group--uneven{flex-direction:row-reverse}#cc-main .cm__btn{background:var(--cc-btn-primary-bg);border:1px solid var(--cc-btn-primary-border-color);border-radius:var(--cc-btn-border-radius);color:var(--cc-btn-primary-color);font-size:.82em;font-weight:600;min-height:42px;padding:.5em 1em;text-align:center}#cc-main .cm__btn:hover{background:var(--cc-btn-primary-hover-bg);border-color:var(--cc-btn-primary-hover-border-color);color:var(--cc-btn-primary-hover-color)}#cc-main .cm__btn--secondary{background:var(--cc-btn-secondary-bg);border-color:var(--cc-btn-secondary-border-color);color:var(--cc-btn-secondary-color)}#cc-main .cm__btn--secondary:hover{background:var(--cc-btn-secondary-hover-bg);border-color:var(--cc-btn-secondary-hover-border-color);color:var(--cc-btn-secondary-hover-color)}#cc-main .cm__btn--close{border-radius:0;border-bottom-left-radius:var(--cc-btn-border-radius);border-right:none;border-top:none;display:none;font-size:1em;height:42px;min-width:auto!important;overflow:hidden;padding:0!important;position:absolute;right:0;top:0;width:42px}#cc-main .cm__btn--close svg{stroke:var(--cc-btn-primary-color);transform:scale(.5);transition:stroke .15s ease}#cc-main .cm__btn--close:hover svg{stroke:var(--cc-btn-primary-hover-color)}#cc-main .cm__btn--close.cm__btn--secondary svg{stroke:var(--cc-btn-secondary-color)}#cc-main .cm__btn--close.cm__btn--secondary:hover svg{stroke:var(--cc-btn-secondary-hover-color)}#cc-main .cm__btn--close+.cm__texts .cm__title{padding-right:3rem}#cc-main .cm--inline .cm__btn-group{grid-auto-flow:column}#cc-main .cm__footer{background:var(--cc-footer-bg);border-top:1px solid var(--cc-footer-border-color);color:var(--cc-footer-color);padding:.4em 0 .5em}#cc-main .cm__links{display:flex;flex-direction:row;padding-bottom:0;padding-top:0}#cc-main .cm__link-group{display:flex;flex-direction:row;font-size:.8em;width:100%}#cc-main .cm__link-group>*+*{margin-left:1.3rem}#cc-main .cm--flip .cm__btn:last-child{grid-row:1}#cc-main .cm--inline.cm--flip .cm__btn:last-child{grid-column:1}#cc-main .cm--box .cm__btn--close{display:block}#cc-main .cm--box.cm--flip .cm__btns{flex-direction:column-reverse}#cc-main .cm--box.cm--wide{max-width:36em}#cc-main .cm--box.cm--wide .cm__btns{flex-direction:row;justify-content:space-between}#cc-main .cm--box.cm--wide .cm__btn-group{grid-auto-flow:column}#cc-main .cm--box.cm--wide .cm__btn{min-width:120px;padding-left:1.8em;padding-right:1.8em}#cc-main .cm--box.cm--wide.cm--flip .cm__btns{flex-direction:row-reverse}#cc-main .cm--box.cm--wide.cm--flip .cm__btn:last-child{grid-column:1}#cc-main .cm--cloud{max-width:54em;width:unset}#cc-main .cm--cloud .cm__body{flex-direction:row}#cc-main .cm--cloud .cm__texts{flex:1}#cc-main .cm--cloud .cm__desc{max-height:9.4em}#cc-main .cm--cloud .cm__btns{border-left:1px solid var(--cc-separator-border-color);border-top:none;max-width:23em}#cc-main .cm--cloud .cm__btn-group{flex-direction:column}#cc-main .cm--cloud .cm__btn{min-width:19em}#cc-main .cm--cloud.cm--flip .cm__btn-group,#cc-main .cm--cloud.cm--flip .cm__btns{flex-direction:column-reverse}#cc-main .cm--cloud.cm--inline .cm__btn-group{flex-direction:row}#cc-main .cm--cloud.cm--inline .cm__btn{min-width:10em}#cc-main .cm--cloud.cm--inline.cm--flip .cm__btn-group{flex-direction:row-reverse}#cc-main .cm--bar{border-radius:0;left:0;margin:0;max-width:unset;opacity:1;right:0;transform:translateY(0);width:100vw;--cc-modal-transition-duration:.35s}#cc-main .cm--bar.cm--top{top:0;transform:translateY(-100%)}#cc-main .cm--bar.cm--bottom{bottom:0;transform:translateY(100%)}#cc-main .cm--bar .cm__body,#cc-main .cm--bar .cm__links{margin:0 auto;max-width:55em;width:100%}#cc-main .cm--bar .cm__body{padding:.5em 0 .9em}#cc-main .cm--bar .cm__btns{border-top:none;flex-direction:row;justify-content:space-between}#cc-main .cm--bar .cm__btn-group{grid-auto-flow:column}#cc-main .cm--bar:not(.cm--inline) .cm__btn+.cm__btn,#cc-main .cm--bar:not(.cm--inline) .cm__btn-group+.cm__btn-group{margin-left:.375rem;margin-top:0}#cc-main .cm--bar .cm__btn{min-width:120px;padding-left:2em;padding-right:2em}#cc-main .cm--bar.cm--flip:not(.cm--inline) .cm__btn+.cm__btn,#cc-main .cm--bar.cm--flip:not(.cm--inline) .cm__btn-group+.cm__btn-group{margin-bottom:0;margin-left:0;margin-right:.375rem}#cc-main .cm--bar.cm--flip .cm__btns{flex-direction:row-reverse}#cc-main .cm--bar.cm--flip .cm__btn:last-child{grid-column:1}#cc-main .cm--bar.cm--inline .cm__body,#cc-main .cm--bar.cm--inline .cm__links{max-width:74em}#cc-main .cm--bar.cm--inline .cm__body{flex-direction:row;padding:0}#cc-main .cm--bar.cm--inline .cm__btns{flex-direction:column;justify-content:center;max-width:23em}#cc-main .cm--bar.cm--inline.cm--flip .cm__btns{flex-direction:column-reverse}#cc-main .cc--anim .cm,#cc-main .cc--anim.cm-wrapper:before{transition:opacity var(--cc-modal-transition-duration) ease,visibility var(--cc-modal-transition-duration) ease,transform var(--cc-modal-transition-duration) ease}#cc-main .cc--anim .cm__btn,#cc-main .cc--anim .cm__close{transition:background-color .15s ease,border-color .15s ease,color .15s ease}.disable--interaction #cc-main .cm-wrapper:before{background:var(--cc-overlay-bg);bottom:0;content:"";left:0;opacity:0;position:fixed;right:0;top:0;visibility:hidden;z-index:0}.show--consent #cc-main .cc--anim .cm{opacity:1;transform:translateY(0);visibility:visible!important}.show--consent #cc-main .cc--anim .cm--middle{transform:translateY(-50%)}.show--consent #cc-main .cc--anim .cm--bar{transform:translateY(0)}.show--consent #cc-main .cc--anim.cm-wrapper:before{opacity:1;visibility:visible}#cc-main.cc--rtl .cm__btn--close{border-bottom-left-radius:unset;border-bottom-right-radius:var(--cc-btn-border-radius);left:0;right:unset}#cc-main.cc--rtl .cm__btn--close+.cm__texts .cm__title{padding-left:3rem!important;padding-right:1.3rem}#cc-main.cc--rtl .cm--inline .cm__btn+.cm__btn{margin-left:0;margin-right:.375rem}#cc-main.cc--rtl .cm--inline.cm--flip .cm__btn+.cm__btn{margin-left:.375rem;margin-right:0}#cc-main.cc--rtl .cm:not(.cm--inline).cm--bar .cm__btn+.cm__btn,#cc-main.cc--rtl .cm:not(.cm--inline).cm--bar .cm__btn-group+.cm__btn-group,#cc-main.cc--rtl .cm:not(.cm--inline).cm--wide .cm__btn+.cm__btn,#cc-main.cc--rtl .cm:not(.cm--inline).cm--wide .cm__btn-group+.cm__btn-group{margin-left:0;margin-right:.375rem}#cc-main.cc--rtl .cm:not(.cm--inline).cm--bar.cm--flip .cm__btn+.cm__btn,#cc-main.cc--rtl .cm:not(.cm--inline).cm--wide.cm--flip .cm__btn+.cm__btn{margin-left:.375rem;margin-right:0}#cc-main.cc--rtl .cm__link-group>*+*{margin-left:0;margin-right:1.3rem}@media screen and (max-width:640px){#cc-main{--cc-modal-margin:.5em}#cc-main .cm{max-width:none!important;width:auto!important}#cc-main .cm__body{flex-direction:column!important;padding:0!important}#cc-main .cm__btns,#cc-main .cm__desc,#cc-main .cm__links,#cc-main .cm__title{padding-left:1.1rem!important;padding-right:1.1rem!important}#cc-main .cm__btns{border-left:none!important;border-top:1px solid var(--cc-separator-border-color)!important;flex-direction:column!important;max-width:none!important;min-width:auto!important}#cc-main .cm__btn+.cm__btn,#cc-main .cm__btn-group+.cm__btn-group{margin:.375rem 0 0!important}#cc-main .cm--flip .cm__btn+.cm__btn,#cc-main .cm--flip .cm__btn-group+.cm__btn-group{margin-bottom:.375rem!important;margin-top:0!important}#cc-main .cm__btn-group{display:flex!important;flex-direction:column!important;min-width:auto!important}#cc-main .cm__btn{flex:auto!important}#cc-main .cm__link-group{justify-content:center!important}#cc-main .cm--flip .cm__btn-group,#cc-main .cm--flip .cm__btns{flex-direction:column-reverse!important}}#cc-main .pm-wrapper{position:relative;z-index:2}#cc-main .pm{background:var(--cc-bg);border-radius:var(--cc-modal-border-radius);box-shadow:0 .625em 1.875em rgba(0,0,2,.3);display:flex;flex-direction:column;opacity:0;overflow:hidden;position:fixed;visibility:hidden;width:100%;width:unset;z-index:1}#cc-main svg{fill:none;width:100%}#cc-main .pm__body,#cc-main .pm__footer,#cc-main .pm__header{padding:1em 1.4em}#cc-main .pm__header{align-items:center;border-bottom:1px solid var(--cc-separator-border-color);display:flex;justify-content:space-between}#cc-main .pm__title{align-items:center;display:flex;flex:1;font-weight:600;margin-right:2em}#cc-main .pm__close-btn{background:var(--cc-btn-secondary-bg);border:1px solid var(--cc-btn-secondary-border-color);border-radius:var(--cc-btn-border-radius);height:40px;position:relative;transition:all .15s ease;width:40px}#cc-main .pm__close-btn span{display:flex;height:100%;width:100%}#cc-main .pm__close-btn svg{stroke:var(--cc-btn-secondary-color);transform:scale(.5);transition:stroke .15s ease}#cc-main .pm__close-btn:hover{background:var(--cc-btn-secondary-hover-bg);border-color:var(--cc-btn-secondary-hover-border-color)}#cc-main .pm__close-btn:hover svg{stroke:var(--cc-btn-secondary-hover-color)}#cc-main .pm__body{flex:1;overflow-y:auto;overflow-y:overlay}#cc-main .pm__section,#cc-main .pm__section--toggle{border-radius:var(--cc-btn-border-radius);display:flex;flex-direction:column;margin-bottom:.5em}#cc-main .pm__section--toggle .pm__section-desc-wrapper{border:1px solid var(--cc-cookie-category-block-border);border-radius:var(--cc-btn-border-radius);border-top:none;border-top-left-radius:0;border-top-right-radius:0;display:none;margin-top:0!important;overflow:hidden}#cc-main .pm__section{border:1px solid var(--cc-separator-border-color);padding:1em;transition:background-color .25s ease,border-color .25s ease}#cc-main .pm__section:first-child{border:none;margin-bottom:2em;margin-top:0;padding:0;transition:none}#cc-main .pm__section:not(:first-child):hover{background:var(--cc-cookie-category-block-bg);border-color:var(--cc-cookie-category-block-border)}#cc-main .pm__section-toggles+.pm__section{margin-top:2em}#cc-main .pm__section--toggle{background:var(--cc-cookie-category-block-bg);border-top:none;margin-bottom:.375rem}#cc-main .pm__section--toggle .pm__section-title{align-items:center;background:var(--cc-cookie-category-block-bg);border:1px solid var(--cc-cookie-category-block-border);display:flex;justify-content:space-between;min-height:58px;padding:1.1em 5.4em 1.1em 1.2em;position:relative;transition:background-color .25s ease,border-color .25s ease;width:100%}#cc-main .pm__section--toggle .pm__section-title:hover{background:var(--cc-cookie-category-block-hover-bg);border-color:var(--cc-cookie-category-block-hover-border)}#cc-main .pm__section--toggle .pm__section-desc{margin-top:0;padding:1em}#cc-main .pm__section--toggle.is-expanded{--cc-cookie-category-block-bg:var(--cc-cookie-category-expanded-block-bg);--cc-cookie-category-block-border:var(--cc-cookie-category-expanded-block-hover-bg)}#cc-main .pm__section--toggle.is-expanded .pm__section-title{border-bottom-left-radius:0;border-bottom-right-radius:0}#cc-main .pm__section--toggle.is-expanded .pm__section-arrow svg{transform:scale(.5) rotate(180deg)}#cc-main .pm__section--toggle.is-expanded .pm__section-desc-wrapper{display:flex}#cc-main .pm__section--expandable .pm__section-title{cursor:pointer;padding-left:3.4em}#cc-main .pm__section--expandable .pm__section-arrow{background:var(--cc-toggle-readonly-bg);border-radius:100%;display:flex;height:20px;justify-content:center;left:18px;pointer-events:none;position:absolute;width:20px}#cc-main .pm__section--expandable .pm__section-arrow svg{stroke:var(--cc-btn-secondary-color);transform:scale(.5)}#cc-main .pm__section-title-wrapper{align-items:center;display:flex;position:relative}#cc-main .pm__section-title-wrapper+.pm__section-desc-wrapper{margin-top:.85em}#cc-main .pm__section-title{border-radius:var(--cc-btn-border-radius);font-size:.95em;font-weight:600}#cc-main .pm__badge{align-items:center;background:var(--cc-btn-secondary-bg);border-radius:5em;color:var(--cc-secondary-color);display:flex;flex:none;font-size:.8em;font-weight:600;height:23px;justify-content:center;margin-left:1em;min-width:23px;overflow:hidden;padding:0 .6em 1px;position:relative;text-align:center;white-space:nowrap;width:auto}#cc-main .pm__service-counter{background:var(--cc-btn-primary-bg);color:var(--cc-btn-primary-color);padding:0;width:23px}#cc-main .pm__service-counter[data-counterlabel]{padding:0 .6em 1px;width:auto}#cc-main .section__toggle,#cc-main .section__toggle-wrapper,#cc-main .toggle__icon,#cc-main .toggle__label{border-radius:var(--cc-pm-toggle-border-radius);height:23px;transform:translateZ(0);width:50px}#cc-main .section__toggle-wrapper{cursor:pointer;position:absolute;right:18px;z-index:1}#cc-main .toggle-service{height:19px;position:relative;right:0;width:42px}#cc-main .toggle-service .section__toggle,#cc-main .toggle-service .toggle__icon,#cc-main .toggle-service .toggle__label{height:19px;width:42px}#cc-main .toggle-service .toggle__icon{position:relative}#cc-main .toggle-service .toggle__icon-circle{height:19px;width:19px}#cc-main .toggle-service .section__toggle:checked~.toggle__icon .toggle__icon-circle{transform:translateX(23px)}#cc-main .pm__section--toggle:nth-child(2) .section__toggle-wrapper:after{display:none!important}#cc-main .section__toggle{border:0;cursor:pointer;display:block;left:0;margin:0;position:absolute;top:0}#cc-main .section__toggle:disabled{cursor:not-allowed}#cc-main .toggle__icon{background:var(--cc-toggle-off-bg);box-shadow:0 0 0 1px var(--cc-toggle-off-bg);display:flex;flex-direction:row;pointer-events:none;position:absolute;transition:all .25s ease}#cc-main .toggle__icon-circle{background:var(--cc-toggle-off-knob-bg);border:none;border-radius:var(--cc-pm-toggle-border-radius);box-shadow:0 1px 2px rgba(24,32,3,.36);display:block;height:23px;left:0;position:absolute;top:0;transition:transform .25s ease,background-color .25s ease;width:23px}#cc-main .toggle__icon-off,#cc-main .toggle__icon-on{height:100%;position:absolute;transition:opacity .15s ease;width:100%}#cc-main .toggle__icon-on{opacity:0;transform:rotate(45deg)}#cc-main .toggle__icon-on svg{stroke:var(--cc-toggle-on-bg);transform:scale(.55) rotate(-45deg)}#cc-main .toggle__icon-off{opacity:1}#cc-main .toggle__icon-off svg{stroke:var(--cc-toggle-off-bg);transform:scale(.55)}#cc-main .section__toggle:checked~.toggle__icon{background:var(--cc-toggle-on-bg);box-shadow:0 0 0 1px var(--cc-toggle-on-bg)}#cc-main .section__toggle:checked~.toggle__icon .toggle__icon-circle{background-color:var(--cc-toggle-on-knob-bg);transform:translateX(27px)}#cc-main .section__toggle:checked~.toggle__icon .toggle__icon-on{opacity:1}#cc-main .section__toggle:checked~.toggle__icon .toggle__icon-off{opacity:0}#cc-main .section__toggle:checked:disabled~.toggle__icon{background:var(--cc-toggle-readonly-bg);box-shadow:0 0 0 1px var(--cc-toggle-readonly-bg)}#cc-main .section__toggle:checked:disabled~.toggle__icon .toggle__icon-circle{background:var(--cc-toggle-readonly-knob-bg);box-shadow:none}#cc-main .section__toggle:checked:disabled~.toggle__icon svg{stroke:var(--cc-toggle-readonly-knob-icon-color)}#cc-main .toggle__label{opacity:0;overflow:hidden;pointer-events:none;position:absolute;top:0;z-index:-1}#cc-main .pm__section-desc-wrapper{color:var(--cc-secondary-color);display:flex;flex-direction:column;font-size:.9em}#cc-main .pm__section-desc-wrapper>:not(:last-child){border-bottom:1px solid var(--cc-cookie-category-block-border)}#cc-main .pm__section-services{display:flex;flex-direction:column}#cc-main .pm__service{align-items:center;display:flex;justify-content:space-between;padding:.4em 1.2em;position:relative;transition:background-color .15s ease}#cc-main .pm__service:hover{background-color:var(--cc-cookie-category-block-hover-bg)}#cc-main .pm__service-header{align-items:center;display:flex;margin-right:1em;width:100%}#cc-main .pm__service-icon{border:2px solid;border-radius:100%;height:8px;margin-left:6px;margin-right:20px;margin-top:1px;min-width:8px}#cc-main .pm__service-title{font-size:.95em;width:100%;word-break:break-word}#cc-main .pm__section-desc{line-height:1.5em}#cc-main .pm__section-table{border-collapse:collapse;font-size:.9em;margin:0;overflow:hidden;padding:0;text-align:left;width:100%}#cc-main .pm__table-caption{text-align:left}#cc-main .pm__table-caption,#cc-main .pm__table-head>tr{border-bottom:1px dashed var(--cc-separator-border-color);color:var(--cc-primary-color);font-weight:600}#cc-main .pm__table-tr{transition:background-color .15s ease}#cc-main .pm__table-tr:hover{background:var(--cc-cookie-category-block-hover-bg)}#cc-main .pm__table-caption,#cc-main .pm__table-td,#cc-main .pm__table-th{padding:.625em .625em .625em 1.2em;vertical-align:top}#cc-main .pm__footer{border-top:1px solid var(--cc-separator-border-color);display:flex;justify-content:space-between}#cc-main .pm__btn-group{display:flex}#cc-main .pm__btn+.pm__btn,#cc-main .pm__btn-group+.pm__btn-group{margin-left:.375rem}#cc-main .pm--flip .pm__btn+.pm__btn,#cc-main .pm--flip .pm__btn-group+.pm__btn-group{margin-left:0;margin-right:.375rem}#cc-main .pm__btn{background:var(--cc-btn-primary-bg);border:1px solid var(--cc-btn-primary-border-color);border-radius:var(--cc-btn-border-radius);color:var(--cc-btn-primary-color);flex:auto;font-size:.82em;font-weight:600;min-height:42px;min-width:110px;padding:.5em 1.5em;text-align:center;transition:background-color .15s ease,border-color .15s ease,color .15s ease}#cc-main .pm__btn:hover{background:var(--cc-btn-primary-hover-bg);border-color:var(--cc-btn-primary-hover-border-color);color:var(--cc-btn-primary-hover-color)}#cc-main .pm__btn--secondary{background:var(--cc-btn-secondary-bg);border-color:var(--cc-btn-secondary-border-color);color:var(--cc-btn-secondary-color)}#cc-main .pm__btn--secondary:hover{background:var(--cc-btn-secondary-hover-bg);border-color:var(--cc-btn-secondary-hover-border-color);color:var(--cc-btn-secondary-hover-color)}#cc-main .pm--box{height:calc(100% - 2em);left:var(--cc-modal-margin);margin:0 auto;max-height:37.5em;max-width:43em;right:var(--cc-modal-margin);top:50%;transform:translateY(calc(-50% + 1.6em))}#cc-main .pm--box.pm--flip .pm__btn-group,#cc-main .pm--box.pm--flip .pm__footer{flex-direction:row-reverse}#cc-main .pm--bar{border-radius:0;bottom:0;height:100%;margin:0;max-height:none;max-width:29em;opacity:1;top:0;width:100%;--cc-modal-transition-duration:.35s}#cc-main .pm--bar .pm__section-table,#cc-main .pm--bar .pm__table-body,#cc-main .pm--bar .pm__table-td,#cc-main .pm--bar .pm__table-th,#cc-main .pm--bar .pm__table-tr{display:block}#cc-main .pm--bar .pm__table-head{display:none}#cc-main .pm--bar .pm__table-caption{display:block}#cc-main .pm--bar .pm__table-tr:not(:last-child){border-bottom:1px solid var(--cc-separator-border-color)}#cc-main .pm--bar .pm__table-td{display:flex;justify-content:space-between}#cc-main .pm--bar .pm__table-td:before{color:var(--cc-primary-color);content:attr(data-column);flex:1;font-weight:600;min-width:100px;overflow:hidden;padding-right:2em;text-overflow:ellipsis}#cc-main .pm--bar .pm__table-td>div{flex:3}#cc-main .pm--bar:not(.pm--wide) .pm__body,#cc-main .pm--bar:not(.pm--wide) .pm__footer,#cc-main .pm--bar:not(.pm--wide) .pm__header{padding:1em 1.3em}#cc-main .pm--bar:not(.pm--wide) .pm__btn-group,#cc-main .pm--bar:not(.pm--wide) .pm__footer{flex-direction:column}#cc-main .pm--bar:not(.pm--wide) .pm__btn+.pm__btn,#cc-main .pm--bar:not(.pm--wide) .pm__btn-group+.pm__btn-group{margin:.375rem 0 0}#cc-main .pm--bar:not(.pm--wide).pm--flip .pm__btn-group,#cc-main .pm--bar:not(.pm--wide).pm--flip .pm__footer{flex-direction:column-reverse}#cc-main .pm--bar:not(.pm--wide).pm--flip .pm__btn+.pm__btn,#cc-main .pm--bar:not(.pm--wide).pm--flip .pm__btn-group+.pm__btn-group{margin-bottom:.375rem;margin-top:0}#cc-main .pm--bar:not(.pm--wide) .pm__badge{display:none}#cc-main .pm--bar.pm--left{left:0;transform:translateX(-100%)}#cc-main .pm--bar.pm--right{right:0;transform:translateX(100%)}#cc-main .pm--bar.pm--wide{max-width:35em}#cc-main .pm--bar.pm--wide .pm__body,#cc-main .pm--bar.pm--wide .pm__footer,#cc-main .pm--bar.pm--wide .pm__header{padding:1em 1.4em}#cc-main .pm--bar.pm--wide.pm--flip .pm__btn-group,#cc-main .pm--bar.pm--wide.pm--flip .pm__footer{flex-direction:row-reverse}#cc-main .pm-overlay{background:var(--cc-overlay-bg);bottom:0;content:"";left:0;opacity:0;position:fixed;right:0;top:0;visibility:hidden;z-index:1}#cc-main .cc--anim .pm,#cc-main .cc--anim .pm-overlay{transition:opacity var(--cc-modal-transition-duration) ease,visibility var(--cc-modal-transition-duration) ease,transform var(--cc-modal-transition-duration) ease}.show--preferences #cc-main .cc--anim .pm{opacity:1;visibility:visible!important}.show--preferences #cc-main .cc--anim .pm--box{transform:translateY(-50%)}.show--preferences #cc-main .cc--anim .pm--bar{transform:translateX(0)}.show--preferences #cc-main .cc--anim .pm-overlay{opacity:1;visibility:visible}#cc-main.cc--rtl .pm__service-header{margin-left:1em;margin-right:0}#cc-main.cc--rtl .pm__section-arrow{left:unset;right:18px}#cc-main.cc--rtl .section__toggle-wrapper{left:18px;right:unset;transform-origin:left}#cc-main.cc--rtl .toggle-service{left:0}#cc-main.cc--rtl .pm__service-icon{margin-left:20px;margin-right:5px}#cc-main.cc--rtl .pm__section--toggle .pm__section-title{padding-left:5.4em;padding-right:1.2em}#cc-main.cc--rtl .pm__section--expandable .pm__section-title{padding-right:3.4em}#cc-main.cc--rtl .pm__badge{margin-left:unset;margin-right:1em}#cc-main.cc--rtl .toggle__icon-circle{transform:translateX(27px)}#cc-main.cc--rtl .toggle-service .toggle__icon-circle{transform:translateX(23px)}#cc-main.cc--rtl .section__toggle:checked~.toggle__icon .toggle__icon-circle{transform:translateX(0)}#cc-main.cc--rtl .pm__table-td,#cc-main.cc--rtl .pm__table-th{padding-left:unset;padding-right:1.2em;text-align:right}#cc-main.cc--rtl .pm__table-td{padding-left:unset;padding-right:1.2em}#cc-main.cc--rtl .pm__table-td:before{padding-left:2em;padding-right:unset}#cc-main.cc--rtl .pm__btn+.pm__btn,#cc-main.cc--rtl .pm__btn-group+.pm__btn-group{margin-left:0;margin-right:.375rem}#cc-main.cc--rtl .pm--flip .pm__btn+.pm__btn,#cc-main.cc--rtl .pm--flip .pm__btn-group+.pm__btn-group{margin-left:.375rem;margin-right:0}#cc-main.cc--rtl .pm--flip.pm--bar:not(.pm--wide) .pm__btn+.pm__btn,#cc-main.cc--rtl .pm--flip.pm--bar:not(.pm--wide) .pm__btn-group+.pm__btn-group{margin-left:0}@media screen and (max-width:640px){#cc-main .pm{border-radius:0;bottom:0;height:auto;left:0;max-height:100%;max-width:none!important;right:0;top:0;transform:translateY(1.6em)}#cc-main .pm__body,#cc-main .pm__footer,#cc-main .pm__header{padding:.9em!important}#cc-main .pm__badge{display:none}#cc-main .pm__section-table,#cc-main .pm__table-body,#cc-main .pm__table-caption,#cc-main .pm__table-td,#cc-main .pm__table-th,#cc-main .pm__table-tr{display:block}#cc-main .pm__table-head{display:none}#cc-main .pm__table-tr:not(:last-child){border-bottom:1px solid var(--cc-separator-border-color)}#cc-main .pm__table-td{display:flex;justify-content:space-between}#cc-main .pm__table-td:before{color:var(--cc-primary-color);content:attr(data-column);flex:1;font-weight:600;min-width:100px;overflow:hidden;padding-right:2em;text-overflow:ellipsis}#cc-main .pm__table-td>div{flex:3}#cc-main .pm__btn-group,#cc-main .pm__footer{flex-direction:column!important}#cc-main .pm__btn-group{display:flex!important}#cc-main .pm__btn+.pm__btn,#cc-main .pm__btn-group+.pm__btn-group{margin:.375rem 0 0!important}#cc-main .pm--flip .pm__btn+.pm__btn,#cc-main .pm--flip .pm__btn-group+.pm__btn-group{margin-bottom:.375rem!important;margin-top:0!important}#cc-main .pm--flip .pm__btn-group,#cc-main .pm--flip .pm__footer{flex-direction:column-reverse!important}.show--preferences #cc-main .cc--anim .pm{transform:translateY(0)!important}}
+#cc-main{--cc-font-family:Archivo,system-ui,-apple-system,"Segoe UI",sans-serif;--cc-bg:#ffffff;--cc-primary-color:#14181F;--cc-secondary-color:#4b5563;
+--cc-btn-primary-bg:#14181F;--cc-btn-primary-color:#ffffff;--cc-btn-primary-border-color:#14181F;--cc-btn-primary-hover-bg:#2F4B63;--cc-btn-primary-hover-color:#ffffff;--cc-btn-primary-hover-border-color:#2F4B63;
+--cc-btn-secondary-bg:#F2F3F0;--cc-btn-secondary-color:#14181F;--cc-btn-secondary-border-color:#D5D8D2;--cc-btn-secondary-hover-bg:#E6E8E3;--cc-btn-secondary-hover-color:#14181F;--cc-btn-secondary-hover-border-color:#C3C7C0;
+--cc-separator-border-color:#D5D8D2;--cc-toggle-on-bg:#14181F;--cc-toggle-off-bg:#8a8f98;--cc-toggle-readonly-bg:#C3C7C0;--cc-link-color:#2F4B63;--cc-cookie-category-block-bg:#F2F3F0;--cc-cookie-category-block-border:#D5D8D2;--cc-cookie-category-block-hover-bg:#E9EBE6;--cc-cookie-category-block-hover-border:#C3C7C0;--cc-overlay-bg:rgba(20,24,31,.55)}
+#ht-cc-open{position:fixed;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));z-index:2147482000;font:11px/1 Archivo,system-ui,sans-serif;color:#4b5563;background:rgba(255,255,255,.94);border:1px solid #D5D8D2;border-radius:999px;padding:7px 11px;cursor:pointer}
+html.show--consent #ht-cc-open,html.show--preferences #ht-cc-open{display:none}
+#ht-cc-open:focus-visible{outline:2px solid #2F4B63;outline-offset:2px}
+</style>
+<script id="cc-lib">/*!
+* CookieConsent 3.1.0
+* https://github.com/orestbida/cookieconsent
+* Author Orest Bida
+* Released under the MIT License
+*/
+var e,t;e=this,t=function(e){'use strict';const t='opt-in',o='opt-out',n='show--consent',a='show--preferences',s='disable--interaction',c='data-category',r='div',i='button',l='aria-hidden',d='btn-group',f='click',_='data-role',u='consentModal',p='preferencesModal';class g{constructor(){this.t={mode:t,revision:0,autoShow:!0,lazyHtmlGeneration:!0,autoClearCookies:!0,manageScriptTags:!0,hideFromBots:!0,cookie:{name:'cc_cookie',expiresAfterDays:182,domain:'',path:'/',secure:!0,sameSite:'Lax'}},this.o={i:{},l:'',_:{},u:{},p:{},m:[],v:!1,h:null,C:null,S:null,M:'',T:!0,D:!1,k:!1,A:!1,N:!1,H:[],V:!1,j:!0,I:[],L:!1,F:'',P:!1,O:[],R:[],B:[],$:[],G:!1,J:!1,U:!1,q:[],K:[],W:[],X:{},Y:{},Z:{},ee:{},te:{},oe:[]},this.ne={ae:{},se:{}},this.ce={},this.re={ie:'cc:onFirstConsent',le:'cc:onConsent',de:'cc:onChange',fe:'cc:onModalShow',_e:'cc:onModalHide',ue:'cc:onModalReady'}}}const m=new g,b=(e,t)=>e.indexOf(t),v=(e,t)=>-1!==b(e,t),y=e=>Array.isArray(e),h=e=>'string'==typeof e,C=e=>!!e&&'object'==typeof e&&!y(e),w=e=>'function'==typeof e,S=e=>Object.keys(e),x=e=>Array.from(new Set(e)),M=()=>document.activeElement,T=e=>e.preventDefault(),D=(e,t)=>e.querySelectorAll(t),k=e=>e.dispatchEvent(new Event('change')),E=e=>{const t=document.createElement(e);return e===i&&(t.type=e),t},A=(e,t,o)=>e.setAttribute(t,o),N=(e,t,o)=>{e.removeAttribute(o?'data-'+t:t)},H=(e,t,o)=>e.getAttribute(o?'data-'+t:t),V=(e,t)=>e.appendChild(t),j=(e,t)=>e.classList.add(t),I=(e,t)=>j(e,'cm__'+t),L=(e,t)=>j(e,'pm__'+t),F=(e,t)=>e.classList.remove(t),P=e=>{if('object'!=typeof e)return e;if(e instanceof Date)return new Date(e.getTime());let t=Array.isArray(e)?[]:{};for(let o in e){let n=e[o];t[o]=P(n)}return t},O=()=>{const e={},{O:t,X:o,Y:n}=m.o;for(const a of t)e[a]=G(n[a],S(o[a]));return e},R=(e,t)=>dispatchEvent(new CustomEvent(e,{detail:t})),B=(e,t,o,n)=>{e.addEventListener(t,o),n&&m.o.m.push({pe:e,ge:t,me:o})},$=()=>{const e=m.t.cookie.expiresAfterDays;return w(e)?e(m.o.F):e},G=(e,t)=>{const o=e||[],n=t||[];return o.filter((e=>!v(n,e))).concat(n.filter((e=>!v(o,e))))},J=e=>{m.o.R=x(e),m.o.F=(()=>{let e='custom';const{R:t,O:o,B:n}=m.o,a=t.length;return a===o.length?e='all':a===n.length&&(e='necessary'),e})()},U=(e,t,o,n)=>{const a='accept-',{show:s,showPreferences:c,hide:r,hidePreferences:i,acceptCategory:l}=t,d=e||document,_=e=>D(d,`[data-cc="${e}"]`),u=(e,t)=>{T(e),l(t),i(),r()},p=_('show-preferencesModal'),g=_('show-consentModal'),b=_(a+'all'),v=_(a+'necessary'),y=_(a+'custom'),h=m.t.lazyHtmlGeneration;for(const e of p)A(e,'aria-haspopup','dialog'),B(e,f,(e=>{T(e),c()})),h&&(B(e,'mouseenter',(e=>{T(e),m.o.N||o(t,n)}),!0),B(e,'focus',(()=>{m.o.N||o(t,n)})));for(let e of g)A(e,'aria-haspopup','dialog'),B(e,f,(e=>{T(e),s(!0)}),!0);for(let e of b)B(e,f,(e=>{u(e,'all')}),!0);for(let e of y)B(e,f,(e=>{u(e)}),!0);for(let e of v)B(e,f,(e=>{u(e,[])}),!0)},z=(e,t)=>{e&&(t&&(e.tabIndex=-1),e.focus(),t&&e.removeAttribute('tabindex'))};let q;const K=e=>{clearTimeout(q),e?j(m.ne.be,s):q=setTimeout((()=>{F(m.ne.be,s)}),500)},Q=['M 19.5 4.5 L 4.5 19.5 M 4.5 4.501 L 19.5 19.5','M 3.572 13.406 L 8.281 18.115 L 20.428 5.885','M 21.999 6.94 L 11.639 17.18 L 2.001 6.82 '],W=(e=0,t=1.5)=>`<svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="${t}"><path d="${Q[e]}"/></svg>`,X=e=>{const t=m.ne,o=m.o;(e=>{const n=e===t.ve,a=o.i.disablePageInteraction?t.be:n?t.ye:t.be;B(a,'keydown',(t=>{if('Tab'!==t.key||!(n?o.k&&!o.A:o.A))return;const a=M(),s=n?o.q:o.K;0!==s.length&&(t.shiftKey?a!==s[0]&&e.contains(a)||(T(t),z(s[1])):a!==s[1]&&e.contains(a)||(T(t),z(s[0])))}),!0)})(e)},Y=['[href]',i,'input','details','[tabindex]'].map((e=>e+':not([tabindex="-1"])')).join(','),Z=e=>{const{o:t,ne:o}=m,n=(e,t)=>{const o=D(e,Y);t[0]=o[0],t[1]=o[o.length-1]};1===e&&t.D&&n(o.ve,t.q),2===e&&t.N&&n(o.he,t.K)},ee=(e,t,o)=>{const{de:n,le:a,ie:s,_e:c,ue:r,fe:i}=m.ce,l=m.re;if(t){const n={modalName:t};return e===l.fe?w(i)&&i(n):e===l._e?w(c)&&c(n):(n.modal=o,w(r)&&r(n)),R(e,n)}const d={cookie:m.o.p};e===l.ie?w(s)&&s(P(d)):e===l.le?w(a)&&a(P(d)):(d.changedCategories=m.o.I,d.changedServices=m.o.ee,w(n)&&n(P(d))),R(e,P(d))},te=(e,t)=>{try{return e()}catch(e){return!t&&console.warn('CookieConsent:',e),!1}},oe=e=>{const{Y:t,ee:o,O:n,X:a,oe:s,p:r,I:i}=m.o;for(const e of n){const n=o[e]||t[e]||[];for(const o of n){const n=a[e][o];if(!n)continue;const{onAccept:s,onReject:c}=n;!n.Ce&&v(t[e],o)?(n.Ce=!0,w(s)&&s()):n.Ce&&!v(t[e],o)&&(n.Ce=!1,w(c)&&c())}}if(!m.t.manageScriptTags)return;const l=s,d=e||r.categories||[],f=(e,n)=>{if(n>=e.length)return;const a=s[n];if(a.we)return f(e,n+1);const r=a.Se,l=a.xe,_=a.Me,u=v(d,l),p=!!_&&v(t[l],_);if(!_&&!a.Te&&u||!_&&a.Te&&!u&&v(i,l)||_&&!a.Te&&p||_&&a.Te&&!p&&v(o[l]||[],_)){a.we=!0;const t=H(r,'type',!0);N(r,'type',!!t),N(r,c);let o=H(r,'src',!0);o&&N(r,'src',!0);const s=E('script');s.textContent=r.innerHTML;for(const{nodeName:e}of r.attributes)A(s,e,r[e]||H(r,e));t&&(s.type=t),o?s.src=o:o=r.src;const i=!!o&&(!t||['text/javascript','module'].includes(t));if(i&&(s.onload=s.onerror=()=>{f(e,++n)}),r.replaceWith(s),i)return}f(e,++n)};f(l,0)},ne='bottom',ae='left',se='center',ce='right',re='inline',ie='wide',le='pm--',de=['middle','top',ne],fe=[ae,se,ce],_e={box:{De:[ie,re],ke:de,Ee:fe,Ae:ne,Ne:ce},cloud:{De:[re],ke:de,Ee:fe,Ae:ne,Ne:se},bar:{De:[re],ke:de.slice(1),Ee:[],Ae:ne,Ne:''}},ue={box:{De:[],ke:[],Ee:[],Ae:'',Ne:''},bar:{De:[ie],ke:[],Ee:[ae,ce],Ae:'',Ne:ae}},pe=e=>{const t=m.o.i.guiOptions,o=t&&t.consentModal,n=t&&t.preferencesModal;0===e&&ge(m.ne.ve,_e,o,'cm--','box','cm'),1===e&&ge(m.ne.he,ue,n,le,'box','pm')},ge=(e,t,o,n,a,s)=>{e.className=s;const c=o&&o.layout,r=o&&o.position,i=o&&o.flipButtons,l=!o||!1!==o.equalWeightButtons,d=c&&c.split(' ')||[],f=d[0],_=d[1],u=f in t?f:a,p=t[u],g=v(p.De,_)&&_,b=r&&r.split(' ')||[],y=b[0],h=n===le?b[0]:b[1],C=v(p.ke,y)?y:p.Ae,w=v(p.Ee,h)?h:p.Ne,S=t=>{t&&j(e,n+t)};S(u),S(g),S(C),S(w),i&&S('flip');const x=s+'__btn--secondary';if('cm'===s){const{He:e,Ve:t}=m.ne;e&&(l?F(e,x):j(e,x)),t&&(l?F(t,x):j(t,x))}else{const{je:e}=m.ne;e&&(l?F(e,x):j(e,x))}},me=(e,t)=>{const o=m.o,n=m.ne,{hide:a,hidePreferences:s,acceptCategory:c}=e,u=e=>{c(e),s(),a()},g=o.u&&o.u.preferencesModal;if(!g)return;const b=g.title,v=g.closeIconLabel,y=g.acceptAllBtn,w=g.acceptNecessaryBtn,x=g.savePreferencesBtn,M=g.sections||[],T=y||w||x;if(n.Ie)n.Le=E(r),L(n.Le,'body');else{n.Ie=E(r),j(n.Ie,'pm-wrapper');const e=E('div');j(e,'pm-overlay'),V(n.Ie,e),B(e,f,s),n.he=E(r),j(n.he,'pm'),A(n.he,'role','dialog'),A(n.he,l,!0),A(n.he,'aria-modal',!0),A(n.he,'aria-labelledby','pm__title'),B(n.be,'keydown',(e=>{27===e.keyCode&&s()}),!0),n.Fe=E(r),L(n.Fe,'header'),n.Pe=E('h2'),L(n.Pe,'title'),n.Pe.id='pm__title',n.Oe=E(i),L(n.Oe,'close-btn'),A(n.Oe,'aria-label',g.closeIconLabel||''),B(n.Oe,f,s),n.Re=E('span'),n.Re.innerHTML=W(),V(n.Oe,n.Re),n.Be=E(r),L(n.Be,'body'),n.$e=E(r),L(n.$e,'footer');var D=E(r);j(D,'btns');var k=E(r),N=E(r);L(k,d),L(N,d),V(n.$e,k),V(n.$e,N),V(n.Fe,n.Pe),V(n.Fe,n.Oe),n.Ge=n.Pe,A(n.Ge,'tabIndex',-1),V(n.he,n.Fe),V(n.he,n.Be),T&&V(n.he,n.$e),V(n.Ie,n.he)}let H;b&&(n.Pe.innerHTML=b,v&&A(n.Oe,'aria-label',v)),M.forEach(((e,t)=>{const a=e.title,s=e.description,c=e.linkedCategory,d=c&&o.P[c],_=e.cookieTable,u=_&&_.body,p=_&&_.caption,m=u&&u.length>0,b=!!d,v=b&&o.X[c],y=C(v)&&S(v)||[],w=b&&(!!s||!!m||S(v).length>0);var x=E(r);if(L(x,'section'),w||s){var M=E(r);L(M,'section-desc-wrapper')}let T=y.length;if(w&&T>0){const e=E(r);L(e,'section-services');for(const t of y){const o=v[t],n=o&&o.label||t,a=E(r),s=E(r),i=E(r),l=E(r);L(a,'service'),L(l,'service-title'),L(s,'service-header'),L(i,'service-icon');const f=be(n,t,d,!0,c);l.innerHTML=n,V(s,i),V(s,l),V(a,s),V(a,f),V(e,a)}V(M,e)}if(a){var D=E(r),k=E(b?i:r);if(L(D,'section-title-wrapper'),L(k,'section-title'),k.innerHTML=a,V(D,k),b){const e=E('span');e.innerHTML=W(2,3.5),L(e,'section-arrow'),V(D,e),x.className+='--toggle';const t=be(a,c,d);let o=g.serviceCounterLabel;if(T>0&&h(o)){let e=E('span');L(e,'badge'),L(e,'service-counter'),A(e,l,!0),A(e,'data-servicecounter',T),o&&(o=o.split('|'),o=o.length>1&&T>1?o[1]:o[0],A(e,'data-counterlabel',o)),e.innerHTML=T+(o?' '+o:''),V(k,e)}if(w){L(x,'section--expandable');var N=c+'-desc';A(k,'aria-expanded',!1),A(k,'aria-controls',N)}V(D,t)}else A(k,'role','heading'),A(k,'aria-level','3');V(x,D)}if(s){var I=E('p');L(I,'section-desc'),I.innerHTML=s,V(M,I)}if(w&&(A(M,l,'true'),M.id=N,((e,t,o)=>{B(k,f,(()=>{t.classList.contains('is-expanded')?(F(t,'is-expanded'),A(o,'aria-expanded','false'),A(e,l,'true')):(j(t,'is-expanded'),A(o,'aria-expanded','true'),A(e,l,'false'))}))})(M,x,k),m)){const e=E('table'),o=E('thead'),a=E('tbody');if(p){const t=E('caption');L(t,'table-caption'),t.innerHTML=p,e.appendChild(t)}L(e,'section-table'),L(o,'table-head'),L(a,'table-body');const s=_.headers,c=S(s),i=n.Je.createDocumentFragment(),l=E('tr');for(const e of c){const o=s[e],n=E('th');n.id='cc__row-'+o+t,A(n,'scope','col'),L(n,'table-th'),n.innerHTML=o,V(i,n)}V(l,i),V(o,l);const d=n.Je.createDocumentFragment();for(const e of u){const o=E('tr');L(o,'table-tr');for(const n of c){const a=s[n],c=e[n],i=E('td'),l=E(r);L(i,'table-td'),A(i,'data-column',a),A(i,'headers','cc__row-'+a+t),l.insertAdjacentHTML('beforeend',c),V(i,l),V(o,i)}V(d,o)}V(a,d),V(e,o),V(e,a),V(M,e)}(w||s)&&V(x,M);const P=n.Le||n.Be;b?(H||(H=E(r),L(H,'section-toggles')),H.appendChild(x)):H=null,V(P,H||x)})),y&&(n.Ue||(n.Ue=E(i),L(n.Ue,'btn'),A(n.Ue,_,'all'),V(k,n.Ue),B(n.Ue,f,(()=>u('all')))),n.Ue.innerHTML=y),w&&(n.je||(n.je=E(i),L(n.je,'btn'),A(n.je,_,'necessary'),V(k,n.je),B(n.je,f,(()=>u([])))),n.je.innerHTML=w),x&&(n.ze||(n.ze=E(i),L(n.ze,'btn'),L(n.ze,'btn--secondary'),A(n.ze,_,'save'),V(N,n.ze),B(n.ze,f,(()=>u()))),n.ze.innerHTML=x),n.Le&&(n.he.replaceChild(n.Le,n.Be),n.Be=n.Le),pe(1),o.N||(o.N=!0,ee(m.re.ue,p,n.he),t(e),V(n.ye,n.Ie),X(n.he),setTimeout((()=>j(n.Ie,'cc--anim')),100)),Z(2)};function be(e,t,o,n,a){const s=m.o,r=m.ne,i=E('label'),d=E('input'),_=E('span'),u=E('span'),p=E('span'),g=E('span'),b=E('span');if(g.innerHTML=W(1,3),b.innerHTML=W(0,3),d.type='checkbox',j(i,'section__toggle-wrapper'),j(d,'section__toggle'),j(g,'toggle__icon-on'),j(b,'toggle__icon-off'),j(_,'toggle__icon'),j(u,'toggle__icon-circle'),j(p,'toggle__label'),A(_,l,'true'),n?(j(i,'toggle-service'),A(d,c,a),r.se[a][t]=d):r.ae[t]=d,n?(e=>{B(d,'change',(()=>{const t=r.se[e],o=r.ae[e];s.Z[e]=[];for(let o in t){const n=t[o];n.checked&&s.Z[e].push(n.value)}o.checked=s.Z[e].length>0}))})(a):(e=>{B(d,f,(()=>{const t=r.se[e],o=d.checked;s.Z[e]=[];for(let n in t)t[n].checked=o,o&&s.Z[e].push(n)}))})(t),d.value=t,p.textContent=e.replace(/<.*>.*<\/.*>/gm,''),V(u,b),V(u,g),V(_,u),s.T)(o.readOnly||o.enabled)&&(d.checked=!0);else if(n){const e=s.Y[a];d.checked=o.readOnly||v(e,t)}else v(s.R,t)&&(d.checked=!0);return o.readOnly&&(d.disabled=!0),V(i,d),V(i,_),V(i,p),i}const ve=()=>{const e=E('span');return m.ne.qe||(m.ne.qe=e),e},ye=(e,t)=>{const o=m.o,n=m.ne,{hide:a,showPreferences:s,acceptCategory:c}=e,p=o.u&&o.u.consentModal;if(!p)return;const g=p.acceptAllBtn,b=p.acceptNecessaryBtn,v=p.showPreferencesBtn,y=p.closeIconLabel,h=p.footer,C=p.label,w=p.title,S=e=>{a(),c(e)};if(!n.Ke){n.Ke=E(r),n.ve=E(r),n.Qe=E(r),n.We=E(r),n.Xe=E(r),j(n.Ke,'cm-wrapper'),j(n.ve,'cm'),I(n.Qe,'body'),I(n.We,'texts'),I(n.Xe,'btns'),o.v?(A(n.ve,'role','dialog'),A(n.ve,'aria-modal','true')):A(n.ve,'role','region'),A(n.ve,l,'false'),C?A(n.ve,'aria-label',C):w&&(A(n.ve,'aria-labelledby','cm__title'),A(n.ve,'aria-describedby','cm__desc'));const e='box',t=o.i.guiOptions,a=t&&t.consentModal,s=(a&&a.layout||e).split(' ')[0]===e;w&&y&&s&&(n.Ve||(n.Ve=E(i),n.Ve.innerHTML=W(),I(n.Ve,'btn'),I(n.Ve,'btn--close'),B(n.Ve,f,(()=>{S([])})),V(n.Qe,n.Ve)),A(n.Ve,'aria-label',y)),V(n.Qe,n.We),(g||b||v)&&V(n.Qe,n.Xe),V(n.ve,n.Qe),V(n.Ke,n.ve),n.Ye=n.ve,A(n.Ye,'tabIndex',-1)}w&&(n.Ze||(n.Ze=E('h2'),n.Ze.className=n.Ze.id='cm__title',V(n.We,n.Ze)),n.Ze.innerHTML=w);let x=p.description;if(x&&(o.V&&(x=x.replace('{{revisionMessage}}',o.j?'':p.revisionMessage||'')),n.et||(n.et=E('p'),n.et.className=n.et.id='cm__desc',V(n.We,n.et)),n.et.innerHTML=x),g&&(n.tt||(n.tt=E(i),V(n.tt,ve()),I(n.tt,'btn'),A(n.tt,_,'all'),B(n.tt,f,(()=>{S('all')}))),n.tt.firstElementChild.innerHTML=g),b&&(n.He||(n.He=E(i),V(n.He,ve()),I(n.He,'btn'),A(n.He,_,'necessary'),B(n.He,f,(()=>{S([])}))),n.He.firstElementChild.innerHTML=b),v&&(n.ot||(n.ot=E(i),V(n.ot,ve()),I(n.ot,'btn'),I(n.ot,'btn--secondary'),A(n.ot,_,'show'),B(n.ot,'mouseenter',(()=>{o.N||me(e,t)})),B(n.ot,f,s)),n.ot.firstElementChild.innerHTML=v),n.nt||(n.nt=E(r),I(n.nt,d),g&&V(n.nt,n.tt),b&&V(n.nt,n.He),(g||b)&&V(n.Qe,n.nt),V(n.Xe,n.nt)),n.ot&&!n.st&&(n.st=E(r),n.He&&n.tt?(I(n.st,d),V(n.st,n.ot),V(n.Xe,n.st)):(V(n.nt,n.ot),I(n.nt,d+'--uneven'))),h){if(!n.ct){let e=E(r),t=E(r);n.ct=E(r),I(e,'footer'),I(t,'links'),I(n.ct,'link-group'),V(t,n.ct),V(e,t),V(n.ve,e)}n.ct.innerHTML=h}pe(0),o.D||(o.D=!0,ee(m.re.ue,u,n.ve),t(e),V(n.ye,n.Ke),o.v&&X(n.ve)),Z(1),U(n.Qe,e,me,t)},he=e=>{if(!h(e))return null;if(e in m.o._)return e;let t=e.slice(0,2);return t in m.o._?t:null},Ce=()=>m.o.l||m.o.i.language.default,we=e=>{e&&(m.o.l=e)},Se=async e=>{const t=m.o;let o=he(e)?e:Ce(),n=t._[o];if(h(n)?n=await(async e=>{try{const t=await fetch(e);return await t.json()}catch(e){return console.error(e),!1}})(n):w(n)&&(n=await n()),!n)throw`Could not load translation for the '${o}' language`;return t.u=n,we(o),!0},xe=()=>{let e=m.o.i.language.rtl,t=m.ne.ye;e&&t&&(y(e)||(e=[e]),v(e,m.o.l)?j(t,'cc--rtl'):F(t,'cc--rtl'))},Me=()=>{const e=m.ne;if(e.ye)return;e.ye=E(r),e.ye.id='cc-main',e.ye.setAttribute('data-nosnippet',''),xe();let t=m.o.i.root;t&&h(t)&&(t=document.querySelector(t)),(t||e.Je.body).appendChild(e.ye)},Te=e=>te((()=>localStorage.removeItem(e))),De=(e,t)=>{if(t instanceof RegExp)return e.filter((e=>t.test(e)));{const o=b(e,t);return o>-1?[e[o]]:[]}},ke=e=>{const{hostname:t,protocol:o}=location,{name:n,path:a,domain:s,sameSite:c,useLocalStorage:r,secure:i}=m.t.cookie,l=e?(()=>{const e=m.o.S,t=e?new Date-e:0;return 864e5*$()-t})():864e5*$(),d=new Date;d.setTime(d.getTime()+l),m.o.p.expirationTime=d.getTime();const f=JSON.stringify(m.o.p);let _=n+'='+encodeURIComponent(f)+(0!==l?'; expires='+d.toUTCString():'')+'; Path='+a+'; SameSite='+c;v(t,'.')&&(_+='; Domain='+s),i&&'https:'===o&&(_+='; Secure'),r?((e,t)=>{te((()=>localStorage.setItem(e,t)))})(n,f):document.cookie=_,m.o.p},Ee=(e,t,o)=>{if(0===e.length)return;const n=o||m.t.cookie.domain,a=t||m.t.cookie.path,s='www.'===n.slice(0,4),c=s&&n.substring(4),r=(e,t)=>{t&&'.'!==t.slice(0,1)&&(t='.'+t),document.cookie=e+'=; path='+a+(t?'; domain='+t:'')+'; expires=Thu, 01 Jan 1970 00:00:01 GMT;'};for(const t of e)r(t,o),o||r(t,n),s&&r(t,c)},Ae=e=>{const t=e||m.t.cookie.name,o=m.t.cookie.useLocalStorage;return((e,t)=>{let o;return o=te((()=>JSON.parse(t?e:decodeURIComponent(e))),!0)||{},o})(o?(n=t,te((()=>localStorage.getItem(n)))||''):Ne(t,!0),o);var n},Ne=(e,t)=>{const o=document.cookie.match('(^|;)\\s*'+e+'\\s*=\\s*([^;]+)');return o?t?o.pop():e:''},He=e=>{const t=document.cookie.split(/;\s*/),o=[];for(const n of t){let t=n.split('=')[0];e?te((()=>{e.test(t)&&o.push(t)})):o.push(t)}return o},Ve=(e,n=[])=>{((e,t)=>{const{O:o,R:n,B:a,N:s,Z:c,$:r,X:i}=m.o;let l=[];if(e){y(e)?l.push(...e):h(e)&&(l='all'===e?o:[e]);for(const e of o)c[e]=v(l,e)?S(i[e]):[]}else l=[...n,...r],s&&(l=(()=>{const e=m.ne.ae;if(!e)return[];let t=[];for(let o in e)e[o].checked&&t.push(o);return t})());l=l.filter((e=>!v(o,e)||!v(t,e))),l.push(...a),J(l)})(e,n),(()=>{const e=m.o,{Z:t,B:o,Y:n,X:a,O:s}=e,c=s;e.te=P(n);for(const s of c){const c=a[s],r=S(c),i=t[s]&&t[s].length>0,l=v(o,s);if(0!==r.length){if(n[s]=[],l)n[s].push(...r);else if(i){const e=t[s];n[s].push(...e)}else n[s]=e.Z[s];n[s]=x(n[s])}}})(),(()=>{const e=m.o;e.I=m.t.mode===o&&e.T?G(e.$,e.R):G(e.R,e.p.categories);let n=e.I.length>0,a=!1;for(const t of e.O)e.ee[t]=G(e.Y[t],e.te[t]),e.ee[t].length>0&&(a=!0);const s=m.ne.ae;for(const t in s)s[t].checked=v(e.R,t);for(const t of e.O){const o=m.ne.se[t],n=e.Y[t];for(const e in o)o[e].checked=v(n,e)}e.C||(e.C=new Date),e.M||(e.M=([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,(e=>(e^crypto.getRandomValues(new Uint8Array(1))[0]&15>>e/4).toString(16)))),e.p={categories:P(e.R),revision:m.t.revision,data:e.h,consentTimestamp:e.C.toISOString(),consentId:e.M,services:P(e.Y),languageCode:m.o.l},e.S&&(e.p.lastConsentTimestamp=e.S.toISOString());let c=!1;const r=n||a;(e.T||r)&&(e.T&&(e.T=!1,c=!0),e.S=e.S?new Date:e.C,e.p.lastConsentTimestamp=e.S.toISOString(),ke(),m.t.autoClearCookies&&(c||r)&&(e=>{const t=m.o,o=He(),n=(e=>{const t=m.o;return(e?t.O:t.I).filter((e=>{const o=t.P[e];return!!o&&!o.readOnly&&!!o.autoClear}))})(e);for(const e in t.ee)for(const n of t.ee[e]){const a=t.X[e][n].cookies;if(!v(t.Y[e],n)&&a)for(const e of a){const t=De(o,e.name);Ee(t,e.path,e.domain)}}for(const a of n){const n=t.P[a].autoClear,s=n&&n.cookies||[],c=v(t.I,a),r=!v(t.R,a),i=c&&r;if(e?r:i){n.reloadPage&&i&&(t.L=!0);for(const e of s){const t=De(o,e.name);Ee(t,e.path,e.domain)}}}})(c),oe()),c&&(ee(m.re.ie),ee(m.re.le),m.t.mode===t)||(r&&ee(m.re.de),e.L&&(e.L=!1,location.reload()))})()},je=e=>{const t=m.o.T?[]:m.o.R;return v(t,e)},Ie=(e,t)=>{const o=m.o.T?[]:m.o.Y[t]||[];return v(o,e)},Le=(e,t,o)=>{let n=[];const a=e=>{if(h(e)){let t=Ne(e);''!==t&&n.push(t)}else n.push(...He(e))};if(y(e))for(let t of e)a(t);else a(e);Ee(n,t,o)},Fe=e=>{const{ne:t,o:o}=m;if(!o.k){if(!o.D){if(!e)return;ye(Be,Me)}o.k=!0,o.J=M(),o.v&&K(!0),j(t.be,n),A(t.ve,l,'false'),setTimeout((()=>{j(m.ne.Ke,'cc--anim')}),100),setTimeout((()=>{z(m.ne.Ye)}),200),ee(m.re.fe,u)}},Pe=()=>{const{ne:e,o:t,re:o}=m;t.k&&(t.k=!1,t.v&&K(),z(e.qe,!0),F(e.be,n),A(e.ve,l,'true'),z(t.J),t.J=null,setTimeout((()=>F(e.Ke,'cc--anim')),100),ee(o._e,u))},Oe=()=>{const e=m.o;e.A||(e.N||me(Be,Me),e.A=!0,e.k?e.U=M():e.J=M(),j(m.ne.be,a),A(m.ne.he,l,'false'),setTimeout((()=>{z(m.ne.Ge)}),100),ee(m.re.fe,p))},Re=()=>{const e=m.o;e.A&&(e.A=!1,(()=>{const e=Ge(),t=m.o.P,o=m.ne.ae,n=m.ne.se,a=e=>v(m.o.$,e);for(const s in o){const c=!!t[s].readOnly;o[s].checked=c||(e?je(s):a(s));for(const t in n[s])n[s][t].checked=c||(e?Ie(t,s):a(s))}})(),z(m.ne.Re,!0),F(m.ne.be,a),A(m.ne.he,l,'true'),e.k?(z(e.U),e.U=null):(z(e.J),e.J=null),ee(m.re._e,p))};var Be={show:Fe,hide:Pe,showPreferences:Oe,hidePreferences:Re,acceptCategory:Ve};const $e=(e,t)=>{const o=Ae(t);return e?o[e]:o},Ge=()=>!m.o.T;e.acceptCategory=Ve,e.acceptService=(e,t)=>{const{O:o,X:n}=m.o;if(!(e&&t&&h(t)&&v(o,t)&&0!==S(n[t]).length))return!1;((e,t)=>{const o=m.o,{X:n,Z:a,N:s}=o,c=m.ne.se[t]||{},r=m.ne.ae[t]||{},i=S(n[t]);if(a[t]=[],h(e)){if('all'===e){if(a[t].push(...i),s)for(let e in c)c[e].checked=!0,k(c[e])}else if(v(i,e)&&a[t].push(e),s)for(let t in c)c[t].checked=e===t,k(c[t])}else if(y(e))for(let o of i){const n=v(e,o);n&&a[t].push(o),s&&(c[o].checked=n,k(c[o]))}const l=0===a[t].length;o.R=l?o.R.filter((e=>e!==t)):x([...o.R,t]),s&&(r.checked=!l,k(r))})(e,t),Ve()},e.acceptedCategory=je,e.acceptedService=Ie,e.eraseCookies=Le,e.getConfig=e=>{const t=m.t,o=m.o.i;return e?t[e]||o[e]:{...t,...o,cookie:{...t.cookie}}},e.getCookie=$e,e.getUserPreferences=()=>{const{F:e,Y:t}=m.o,{accepted:o,rejected:n}=(()=>{const{T:e,R:t,O:o}=m.o;return{accepted:t,rejected:e?[]:o.filter((e=>!v(t,e)))}})();return P({acceptType:e,acceptedCategories:o,rejectedCategories:n,acceptedServices:t,rejectedServices:O()})},e.hide=Pe,e.hidePreferences=Re,e.loadScript=(e,t)=>{let o=document.querySelector('script[src="'+e+'"]');return new Promise((n=>{if(o)return n(!0);if(o=E('script'),C(t))for(const e in t)A(o,e,t[e]);o.onload=()=>n(!0),o.onerror=()=>{o.remove(),n(!1)},o.src=e,V(document.head,o)}))},e.reset=e=>{const{ye:t,be:o}=m.ne,{name:c,path:r,domain:i,useLocalStorage:l}=m.t.cookie;e&&(l?Te(c):Le(c,r,i));for(const{pe:e,ge:t,me:o}of m.o.m)e.removeEventListener(t,o);t&&t.remove(),o&&o.classList.remove(s,a,n);const d=new g;for(const e in m)m[e]=d[e];window._ccRun=!1},e.run=async e=>{const{o:t,t:n,re:a}=m,s=window;if(!s._ccRun){if(s._ccRun=!0,(e=>{const{ne:t,t:n,o:a}=m,s=n,r=a,{cookie:i}=s,l=m.ce,d=e.cookie,f=e.categories,_=S(f)||[],u=navigator,p=document;t.Je=p,t.be=p.documentElement,i.domain=location.hostname,r.i=e,r.P=f,r.O=_,r._=e.language.translations,r.v=!!e.disablePageInteraction,l.ie=e.onFirstConsent,l.le=e.onConsent,l.de=e.onChange,l._e=e.onModalHide,l.fe=e.onModalShow,l.ue=e.onModalReady;const{mode:g,autoShow:b,lazyHtmlGeneration:y,autoClearCookies:h,revision:w,manageScriptTags:x,hideFromBots:M}=e;g===o&&(s.mode=g),'boolean'==typeof h&&(s.autoClearCookies=h),'boolean'==typeof x&&(s.manageScriptTags=x),'number'==typeof w&&w>=0&&(s.revision=w,r.V=!0),'boolean'==typeof b&&(s.autoShow=b),'boolean'==typeof y&&(s.lazyHtmlGeneration=y),!1===M&&(s.hideFromBots=!1),!0===s.hideFromBots&&u&&(r.G=u.userAgent&&/bot|crawl|spider|slurp|teoma/i.test(u.userAgent)||u.webdriver),C(d)&&(s.cookie={...i,...d}),s.autoClearCookies,r.V,s.manageScriptTags,(e=>{const{P:t,X:o,Y:n,Z:a,B:s}=m.o;for(let c of e){const e=t[c],r=e.services||{},i=C(r)&&S(r)||[];o[c]={},n[c]=[],a[c]=[],e.readOnly&&(s.push(c),n[c]=i),m.ne.se[c]={};for(let e of i){const t=r[e];t.Ce=!1,o[c][e]=t}}})(_),(()=>{if(!m.t.manageScriptTags)return;const e=m.o,t=D(document,'script['+c+']');for(const o of t){let t=H(o,c),n=o.dataset.service||'',a=!1;if(t&&'!'===t.charAt(0)&&(t=t.slice(1),a=!0),'!'===n.charAt(0)&&(n=n.slice(1),a=!0),v(e.O,t)&&(e.oe.push({Se:o,we:!1,Te:a,xe:t,Me:n}),n)){const o=e.X[t];o[n]||(o[n]={Ce:!1})}}})(),we((()=>{const e=m.o.i.language.autoDetect;if(e){const t={browser:navigator.language,document:document.documentElement.lang},o=he(t[e]);if(o)return o}return Ce()})())})(e),t.G)return;(()=>{const e=m.o,t=m.t,n=Ae(),{categories:a,services:s,consentId:c,consentTimestamp:r,lastConsentTimestamp:i,data:l,revision:d}=n,f=y(a);e.p=n,e.M=c;const _=!!c&&h(c);e.C=r,e.C&&(e.C=new Date(r)),e.S=i,e.S&&(e.S=new Date(i)),e.h=void 0!==l?l:null,e.V&&_&&d!==t.revision&&(e.j=!1),e.T=!(_&&e.j&&e.C&&e.S&&f),t.cookie.useLocalStorage&&!e.T&&(e.T=(new Date).getTime()>(n.expirationTime||0),e.T&&Te(t.cookie.name)),e.T,(()=>{const e=m.o;for(const t of e.O){const n=e.P[t];if(n.readOnly||n.enabled){e.$.push(t);const n=e.X[t]||{};for(let a in n)e.Z[t].push(a),e.i.mode===o&&e.Y[t].push(a)}}})(),e.T?t.mode===o&&(e.R=[...e.$]):(e.Y={...e.Y,...s},e.Z={...e.Y},J([...e.B,...a]))})();const i=Ge();if(!await Se())return!1;if(U(null,r=Be,me,Me),m.o.T&&ye(r,Me),m.t.lazyHtmlGeneration||me(r,Me),n.autoShow&&!i&&Fe(!0),i)return oe(),ee(a.le);n.mode===o&&oe(t.$)}var r},e.setCookieData=e=>{let t,o=e.value,n=e.mode,a=!1;const s=m.o;if('update'===n){s.h=t=$e('data');const e=typeof t==typeof o;if(e&&'object'==typeof t){!t&&(t={});for(let e in o)t[e]!==o[e]&&(t[e]=o[e],a=!0)}else!e&&t||t===o||(t=o,a=!0)}else t=o,a=!0;return a&&(s.h=t,s.p.data=t,ke(!0)),a},e.setLanguage=async(e,t)=>{if(!he(e))return!1;const o=m.o;return!(e===Ce()&&!0!==t||!await Se(e)||(we(e),o.D&&ye(Be,Me),o.N&&me(Be,Me),xe(),0))},e.show=Fe,e.showPreferences=Oe,e.validConsent=Ge,e.validCookie=e=>''!==Ne(e,!0)},'object'==typeof exports&&'undefined'!=typeof module?t(exports):'function'==typeof define&&define.amd?define(['exports'],t):t((e='undefined'!=typeof globalThis?globalThis:e||self).CookieConsent={});
+</script>
+<!-- Google Analytics (GA4). The Google tag G-3CGBGMYXRM loads only after the visitor accepts analytics. -->
+<script id="ht-analytics">
+(function(){
+  // Set this to the address of your Cookie Policy page, e.g. 'https://yoursite.com/cookie-policy'
+  var COOKIE_POLICY_URL='/cookie-policy';
+  var GA_ID='G-3CGBGMYXRM', granted=false, loaded=false, lastView='';
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag=gtag;
+
+  var VIEWS={'':'Home','#deep-dive':'LCA Deep Dive','#data':'Data & Assumptions'};
+  function trackView(force){
+    if(!granted)return;
+    var h=location.hash; if(!(h in VIEWS))h='';
+    if(!force&&h===lastView)return; lastView=h;
+    gtag('event','page_view',{page_title:'The Honest Tag - '+VIEWS[h],page_location:location.origin+location.pathname+h,page_path:location.pathname+h});
+  }
+  // Google tag (gtag.js, ID G-3CGBGMYXRM): loaded only once the visitor accepts analytics.
+  function load(){
+    if(loaded)return; loaded=true;
+    var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+GA_ID;document.head.appendChild(s);
+    gtag('js',new Date());
+    gtag('config',GA_ID,{send_page_view:false});
+  }
+  function grant(){ if(granted)return; granted=true; window['ga-disable-'+GA_ID]=false; load(); trackView(true); }
+  function revoke(){ granted=false; window['ga-disable-'+GA_ID]=true; }
+  function sync(){ (window.CookieConsent&&CookieConsent.acceptedCategory('analytics'))?grant():revoke(); }
+
+  // Virtual page views when the app switches tabs (it uses history.pushState + hash).
+  var _push=history.pushState;
+  history.pushState=function(){var r=_push.apply(this,arguments);setTimeout(function(){trackView(false)},0);return r;};
+  window.addEventListener('popstate',function(){trackView(false)});
+  window.addEventListener('hashchange',function(){trackView(false)});
+
+  // Usage events: only the names of the options people pick, nothing typed in.
+  function text(el){var t=window.htEn?window.htEn(el):(el&&el.textContent||'');return (t||'').replace(/\s+/g,' ').trim();}
+  function track(name,params){ if(granted) gtag('event',name,params||{}); }
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest)return;
+    var card=t.closest('.ht-card'); if(card){track('select_garment',{garment:text(card.querySelector('b'))});return;}
+    var seg=t.closest('.ht-seg button'); if(seg&&!seg.disabled){track('select_freight_mode',{freight_mode:text(seg)});return;}
+    var btn=t.closest('button'); if(btn){var tx=text(btn); if(/^(copy|print( label)?)$/i.test(tx))track('label_action',{action:tx.toLowerCase()});}
+  },true);
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!t||!t.matches)return;
+    var o=text(t.selectedOptions&&t.selectedOptions[0]);
+    if(t.id==='origin-select')track('select_origin',{origin_country:o});
+    else if(t.id==='dest-country-select')track('select_destination',{destination_country:o});
+    else if(t.matches('select[aria-label="Primary fiber"]'))track('select_fiber',{slot:'primary',fiber:o});
+    else if(t.matches('select[aria-label="Secondary fiber"]'))track('select_fiber',{slot:'secondary',fiber:o});
+  },true);
+
+  function init(){
+    if(!window.CookieConsent){if(window.console)console.warn('Cookie consent library not loaded: analytics stays off');return;}
+    CookieConsent.run({
+      guiOptions:{consentModal:{layout:'box inline',position:'bottom left',equalWeightButtons:true,flipButtons:false},preferencesModal:{layout:'box',equalWeightButtons:true,flipButtons:false}},
+      categories:{
+        necessary:{enabled:true,readOnly:true},
+        analytics:{autoClear:{cookies:[{name:/^_ga/}]}}
+      },
+      language:{default:(window.htLang==='it'||window.htLang==='es'||window.htLang==='de'?window.htLang:'en'),translations:{de:{
+        consentModal:{
+          title:'Wir respektieren deine Privatsphäre',
+          description:'Wir verwenden Cookies, um den Website-Verkehr zu analysieren und dein Surferlebnis zu verbessern. Du kannst alle Cookies akzeptieren oder deine Einstellungen verwalten. Lies unsere '+(COOKIE_POLICY_URL?'<a href="'+COOKIE_POLICY_URL+'" target="_blank" rel="noopener" class="cc__link">Cookie-Richtlinie</a>':'Cookie-Richtlinie')+'.',
+          acceptAllBtn:'Alle akzeptieren',acceptNecessaryBtn:'Alle ablehnen',showPreferencesBtn:'Einstellungen verwalten'
+        },
+        preferencesModal:{
+          title:'Cookie-Einstellungen',acceptAllBtn:'Alle akzeptieren',acceptNecessaryBtn:'Alle ablehnen',savePreferencesBtn:'Einstellungen speichern',closeIconLabel:'Schließen',
+          sections:[
+            {title:'Wie wir Cookies verwenden',description:'Cookies helfen uns zu verstehen, wie die Website genutzt wird. Du kannst deine Auswahl jederzeit über die Schaltfläche Cookie-Einstellungen ändern.'},
+            {title:'Unbedingt erforderlich',description:'Speichern deine Cookie-Auswahl. Immer aktiv.',linkedCategory:'necessary'},
+            {title:'Analyse',description:'Google-Analytics-Cookies (_ga), die Besuche zählen und zeigen, welche Optionen am häufigsten genutzt werden. Deaktiviert, sofern du sie nicht akzeptierst.',linkedCategory:'analytics'}
+          ]
+        }
+      },es:{
+        consentModal:{
+          title:'Respetamos tu privacidad',
+          description:'Usamos cookies para analizar el tráfico del sitio y mejorar tu experiencia de navegación. Puedes aceptar todas las cookies o gestionar tus preferencias. Lee nuestra '+(COOKIE_POLICY_URL?'<a href="'+COOKIE_POLICY_URL+'" target="_blank" rel="noopener" class="cc__link">Política de cookies</a>':'Política de cookies')+'.',
+          acceptAllBtn:'Aceptar todas',acceptNecessaryBtn:'Rechazar todas',showPreferencesBtn:'Gestionar preferencias'
+        },
+        preferencesModal:{
+          title:'Preferencias de cookies',acceptAllBtn:'Aceptar todas',acceptNecessaryBtn:'Rechazar todas',savePreferencesBtn:'Guardar preferencias',closeIconLabel:'Cerrar',
+          sections:[
+            {title:'Cómo usamos las cookies',description:'Las cookies nos ayudan a entender cómo se usa el sitio. Puedes cambiar tu elección en cualquier momento con el botón Ajustes de cookies.'},
+            {title:'Estrictamente necesarias',description:'Recuerdan tu elección sobre las cookies. Siempre activas.',linkedCategory:'necessary'},
+            {title:'Analítica',description:'Cookies de Google Analytics (_ga) que cuentan las visitas y muestran qué opciones se usan más. Desactivadas salvo que las aceptes.',linkedCategory:'analytics'}
+          ]
+        }
+      },it:{
+        consentModal:{
+          title:'Rispettiamo la tua privacy',
+          description:'Usiamo i cookie per analizzare il traffico del sito e migliorare la tua esperienza di navigazione. Puoi accettare tutti i cookie o gestire le tue preferenze. Leggi la nostra '+(COOKIE_POLICY_URL?'<a href="'+COOKIE_POLICY_URL+'" target="_blank" rel="noopener" class="cc__link">Informativa sui cookie</a>':'Informativa sui cookie')+'.',
+          acceptAllBtn:'Accetta tutti',acceptNecessaryBtn:'Rifiuta tutti',showPreferencesBtn:'Gestisci preferenze'
+        },
+        preferencesModal:{
+          title:'Preferenze sui cookie',acceptAllBtn:'Accetta tutti',acceptNecessaryBtn:'Rifiuta tutti',savePreferencesBtn:'Salva preferenze',closeIconLabel:'Chiudi',
+          sections:[
+            {title:'Come usiamo i cookie',description:'I cookie ci aiutano a capire come viene usato il sito. Puoi cambiare la tua scelta in qualsiasi momento con il pulsante Impostazioni cookie.'},
+            {title:'Strettamente necessari',description:'Ricordano la tua scelta sui cookie. Sempre attivi.',linkedCategory:'necessary'},
+            {title:'Analisi',description:'Cookie di Google Analytics (_ga) che contano le visite e mostrano quali opzioni sono usate di più. Disattivati se non accetti.',linkedCategory:'analytics'}
+          ]
+        }
+      },en:{
+        consentModal:{
+          title:'We value your privacy',
+          description:'We use cookies to analyze website traffic and improve your browsing experience. You can choose to accept all cookies or manage your preferences. Read our '+(COOKIE_POLICY_URL?'<a href="'+COOKIE_POLICY_URL+'" target="_blank" rel="noopener" class="cc__link">Cookie Policy</a>':'Cookie Policy')+'.',
+          acceptAllBtn:'Accept all',acceptNecessaryBtn:'Reject all',showPreferencesBtn:'Manage preferences'
+        },
+        preferencesModal:{
+          title:'Cookie preferences',acceptAllBtn:'Accept all',acceptNecessaryBtn:'Reject all',savePreferencesBtn:'Save preferences',closeIconLabel:'Close',
+          sections:[
+            {title:'How we use cookies',description:'Cookies help us understand how the site is used. You can change your choice at any time with the Cookie settings button.'},
+            {title:'Strictly necessary',description:'Remembers your cookie choice. Always on.',linkedCategory:'necessary'},
+            {title:'Analytics',description:'Google Analytics cookies (_ga) that count visits and show which options are used most. Off unless you accept.',linkedCategory:'analytics'}
+          ]
+        }
+      }}},
+      onFirstConsent:sync,onConsent:sync,onChange:sync
+    }).catch(function(e){console.error('CC',e&&e.message)});
+    var b=document.createElement('button');b.type='button';b.id='ht-cc-open';var PL={en:['Cookie settings','Open cookie settings'],it:['Impostazioni cookie','Apri le impostazioni dei cookie'],es:['Ajustes de cookies','Abrir los ajustes de cookies'],de:['Cookie-Einstellungen','Cookie-Einstellungen öffnen']};function pl(){var x=PL[window.htLang==='it'||window.htLang==='es'||window.htLang==='de'?window.htLang:'en'];b.textContent=x[0];b.setAttribute('aria-label',x[1]);}pl();window.addEventListener('ht-lang',function(e){pl();try{CookieConsent.setLanguage(e.detail==='it'||e.detail==='es'||e.detail==='de'?e.detail:'en');}catch(_){}});
+    b.addEventListener('click',function(){CookieConsent.showPreferences();});document.body.appendChild(b);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</head>
+<body>
+<style>
+.top{flex-wrap:wrap}
+.topr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tabs a{display:inline-flex;align-items:center;border-radius:7px;padding:7px 13px;font-weight:600;font-size:14px;color:var(--muted);text-decoration:none;white-space:nowrap}
+.tabs a:hover,.tabs button:hover{color:var(--ink)}
+.tabs button{white-space:nowrap}
+.langs{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--card)}
+.langs button{border:0;background:transparent;padding:6px 8px;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--muted);cursor:pointer;min-width:30px}
+.langs button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+@media (max-width:760px){
+  .topr{display:contents}
+  .langs{margin-left:auto}
+  .tabs{order:3;width:100%;overflow-x:auto;scrollbar-width:none}
+  .tabs button,.tabs a{padding:7px 10px;font-size:13px}
+  .tabs::-webkit-scrollbar{display:none}
+}
+@media (max-width:900px){body.has-bar[data-view="follow"] #ht-cc-open{bottom:calc(74px + env(safe-area-inset-bottom,0px))}}
+@media print{.tabs,.langs,#ht-cc-open{display:none}}
+@media (max-width:900px){.sheetbtn{gap:10px}.sheetbtn>span{white-space:nowrap;flex-shrink:0}.sheetbtn .mini{flex:1 1 auto;min-width:24px}}
+</style>
+<header class="top">
+  <a class="brand" href="./" aria-label="The Honest Tag">
+    <svg viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 22 L32 8 L50 22 V52 a4 4 0 0 1 -4 4 H18 a4 4 0 0 1 -4 -4 Z" stroke="currentColor" stroke-width="5"/><circle cx="32" cy="22" r="5" stroke="#C8571F" stroke-width="5"/></svg>
+    <span>The Honest Tag</span>
+  </a>
+  <div class="topr">
+    <div class="tabs" role="tablist" data-i="aria-label:langAria">
+      <button type="button" role="tab" id="tab-follow" data-view="follow" aria-selected="true" aria-controls="v-follow" data-t="tabFollow"></button>
+      <button type="button" role="tab" id="tab-read" data-view="read" aria-selected="false" aria-controls="v-read" data-t="tabRead"></button>
+      <a href="calculator.html" id="calc-link" data-t="tabCalc"></a>
+    </div>
+    <div class="langs" role="group" id="langs"></div>
+  </div>
+</header>
+
+<div class="shell">
+<main>
+  <section class="hero" id="v-follow" role="tabpanel" aria-labelledby="h0">
+    <h1 id="h0" data-t="h0"></h1>
+    <p data-t="p0"></p>
+    <div class="picks" id="picks"></div>
+    <p class="small" style="margin-top:16px" id="holding"></p>
+  </section>
+
+  <section class="hero" id="v-read" role="tabpanel" aria-labelledby="h1">
+    <h1 id="h1" data-t="h1"></h1>
+    <p data-t="p1"></p>
+    <div class="care">
+      <label for="tagtext" data-t="careLabel"></label>
+      <textarea id="tagtext" spellcheck="false"></textarea>
+      <div class="hint" data-t="careHint"></div>
+    </div>
+    <div class="examples" id="examples"></div>
+    <div class="read" aria-live="polite">
+      <div class="chips" id="chips"></div>
+      <div>
+        <div class="small" style="margin-bottom:6px" data-t="whatKind"></div>
+        <div class="garments" id="garments"></div>
+      </div>
+      <div class="row"><button class="go" id="go" type="button" disabled data-t="go"></button><span class="small" id="gohint"></span></div>
+    </div>
+  </section>
+
+  <div class="journey" id="journey">
+    <div class="thread" aria-hidden="true"><i id="threadfill"></i></div>
+    <div class="needle" id="needle" aria-hidden="true"></div>
+
+    <section class="stop" id="s-raw">
+      <span class="knot" aria-hidden="true"></span>
+      <p class="where" id="raw-where"></p>
+      <h2 id="raw-h"></h2>
+      <p class="lede" id="raw-lede"></p>
+      <div class="panel">
+        <h3 data-t="rawPanelH"></h3>
+        <p class="small" id="raw-sub"></p>
+        <div class="opts" id="raw-opts"></div>
+      </div>
+    </section>
+
+    <section class="stop" id="s-mill">
+      <span class="knot" aria-hidden="true"></span>
+      <p class="where" data-t="millWhere"></p>
+      <h2 id="mill-h"></h2>
+      <p class="lede" id="mill-lede"></p>
+      <div class="panel">
+        <h3 data-t="millPanelH"></h3>
+        <p class="small" data-t="millSub"></p>
+        <div class="opts" id="mill-opts"></div>
+      </div>
+    </section>
+
+    <section class="stop" id="s-fr">
+      <span class="knot" aria-hidden="true"></span>
+      <p class="where" data-t="frWhere"></p>
+      <h2 id="fr-h"></h2>
+      <p class="lede" id="fr-lede"></p>
+      <div class="panel">
+        <h3 data-t="frPanelH"></h3>
+        <p class="small" data-t="frSub"></p>
+        <div class="opts" id="fr-opts"></div>
+        <p class="callout small" id="fr-note"></p>
+      </div>
+    </section>
+
+    <section class="stop" id="s-wear">
+      <span class="knot" aria-hidden="true"></span>
+      <p class="where" data-t="wearWhere"></p>
+      <h2 id="wear-h"></h2>
+      <p class="lede" data-t="wearLede"></p>
+      <div class="panel">
+        <h3 data-t="wearPanelH"></h3>
+        <div class="slider"><input type="range" id="wears" min="5" max="150" step="1" value="30" data-i="aria-label:wearsAria"><output id="wears-o" for="wears" class="num"></output></div>
+        <svg class="curve" id="curve" viewBox="0 0 600 120" preserveAspectRatio="none" role="img" data-i="aria-label:curveAria"></svg>
+        <div class="facts">
+          <div class="fact"><div class="v num" id="perwear"></div><div class="l" data-t="perwearL"></div></div>
+          <div class="fact"><div class="v num" id="perwear5"></div><div class="l" data-t="perwear5L"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stop" id="s-use">
+      <span class="knot" aria-hidden="true"></span>
+      <p class="where" data-t="useWhere"></p>
+      <h2 id="use-h"></h2>
+      <p class="lede" id="use-lede"></p>
+      <div class="panel">
+        <h3 data-t="usePanelH"></h3>
+        <div class="row" style="gap:18px;margin-top:8px">
+          <div class="seg" role="group" id="temp" data-i="aria-label:tempAria"></div>
+          <span class="row" style="gap:8px"><span class="small" data-t="washedAfter"></span><span class="seg" role="group" id="wpw" data-i="aria-label:washedAfter"></span></span>
+          <label class="toggle"><input type="checkbox" id="dryer"> <span data-t="dryer"></span></label>
+        </div>
+        <div class="facts" id="use-facts"></div>
+      </div>
+    </section>
+
+    <section class="stop" id="s-eol">
+      <span class="knot" aria-hidden="true"></span>
+      <p class="where" data-t="eolWhere"></p>
+      <h2 id="eol-h"></h2>
+      <p class="lede" id="eol-lede"></p>
+      <div class="panel">
+        <h3 data-t="eolPanelH"></h3>
+        <p class="small" data-t="eolSub"></p>
+        <div class="opts" id="eol-opts"></div>
+      </div>
+    </section>
+
+    <section class="stop finale" id="s-end">
+      <span class="knot" aria-hidden="true"></span>
+      <p class="where" data-t="endWhere"></p>
+      <h2 id="end-h"></h2>
+      <p class="lever" id="lever"></p>
+      <div class="links">
+        <button class="ghost" type="button" id="again" data-t="again"></button>
+        <button class="ghost" type="button" data-goview="read" data-t="readOwn"></button>
+        <a class="go" href="calculator.html" id="calc-link2" style="text-decoration:none" data-t="openCalc"></a>
+      </div>
+      <p class="small" style="margin-top:22px;max-width:60ch" data-t="endNote"></p>
+    </section>
+  </div>
+</main>
+
+<aside class="tagcol" id="tagcol" data-i="aria-label:tagAria">
+  <button class="sheetbtn" id="sheetbtn" type="button" aria-expanded="false" aria-controls="hang">
+    <span><span class="v num" id="m-total">–</span> <span class="lab">kg CO₂e</span></span>
+    <span class="delta num" id="m-delta" aria-hidden="true"></span>
+    <span class="mini" id="m-bar"></span>
+    <span class="lab" id="m-lab"></span>
+  </button>
+  <div class="hang" id="hang">
+    <svg class="loop" viewBox="0 0 70 60" aria-hidden="true"><path d="M8 58 C8 10, 62 10, 62 58" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>
+    <div class="tag">
+      <span class="hole" aria-hidden="true"></span>
+      <h4 data-t="tagH"></h4>
+      <div class="bar0"></div>
+      <div class="who" id="t-who"></div>
+      <div class="whosub" id="t-sub"></div>
+      <div class="total"><span class="v num" id="t-total">–</span><span class="u">kg CO₂e</span><span class="delta num" id="t-delta" aria-live="polite"></span></div>
+      <div class="sbar" id="t-bar" aria-hidden="true"></div>
+      <ul class="rows" id="t-rows"></ul>
+      <div class="minor">
+        <div><span class="v num" id="t-water">–</span><span class="small" data-t="water"></span></div>
+        <div><span class="v num" id="t-mp">–</span><span class="small" data-t="mp"></span></div>
+      </div>
+      <div class="foot" id="t-foot"></div>
+    </div>
+  </div>
+</aside>
+</div>
+
+<script>
+(function(){
+"use strict";
+var JL={
+en:{
+title:"The Honest Tag – Follow a garment",tabFollow:"Follow a garment",tabRead:"Read your tag",tabCalc:"Calculator",langAria:"Language",
+h0:"Follow a garment from field to bin.",p0:"Pick one and scroll down. At every stop you can change a choice and watch its honest tag change.",
+holding:"Holding a real one? {link} and follow that garment instead.",holdingLink:"Read its label",
+h1:"Read the tag in your hand.",p1:"Copy what the care label says. We’ll follow that garment from the field to the bin and write its honest tag as you go.",
+careLabel:"What does the label say?",placeholder:"60% cotton, 40% polyester\nMade in Bangladesh",
+careHint:"Fibres with percentages, and the country after “Made in”. English, Italian, Spanish or German all work.",
+examplesAria:"Example labels",
+ex:[["100% Cotton\nMade in Bangladesh","100% cotton, Bangladesh"],["82% Polyester 18% Elastane\nMade in China","Leggings, China"],["100% Linen\nMade in Italy","100% linen, Italy"],["65% Recycled cotton, 35% recycled polyester\nMade in Portugal","Recycled blend, Portugal"]],
+whatKind:"What kind of garment is it?",go:"Follow this garment",goEmpty:"Type a label or pick an example.",goNoFibre:"No fibre found yet. Try “100% cotton”.",goOk:"{garment}, {g} g (a typical weight)",
+madeIn:"Made in {c}",countryGuess:"Country not found, using {c}",unknown:"Didn’t recognise: {x}",unknownCountry:"“{x}” isn’t in the list yet.",
+scaledUnknown:"Fibres we didn’t recognise are left out, and the rest is scaled up to 100%.",scaled:"Percentages didn’t add up to 100, so they were scaled.",fromLabel:"From your label",
+whereField:"In the field",whereOil:"From oil to polymer",whereForest:"From forest to pulp",whereFarm:"On the farm",
+rawH:"{g} g of {blend}",rawLede:"Growing or making this fibre releases {kg} and uses {L} of water.",rawLedeSyn:"Growing or making this fibre releases {kg} and uses {L} of water, and the plastic part will shed microfibres every wash.",
+rawPanelH:"Same garment, different fibre",rawSub:"Swap the main fibre ({p}% of the garment) and see the whole tag change.",
+millWhere:"Spinning, weaving, dyeing and sewing",millLede:"Turning fibre into a finished garment adds {kg}, usually the biggest part of its footprint. The electricity there emits {g} g CO₂e per kWh, against a world average of {ref}.",
+millPanelH:"Where it was made",millSub:"Most of the energy here is electricity, so the country’s power grid changes the number.",
+frWhere:"Shipping to Europe",frH_sea:"{km} km by container ship",frH_air:"{km} km by air freight",frH_road:"{km} km by truck",
+frLede:"The trip to a European shop adds {kg}, {share} of its whole life.",lt1:"less than 1%",
+frPanelH:"How it travelled",frSub:"Distances are typical routes from the factory to a European city.",
+M_sea:"Container ship",M_air:"Air freight",M_road:"Truck",noRoute:"No overland route",
+frNote:"Flying it would release about {x} times as much freight CO₂ as shipping it. Express delivery from far away is mostly air.",
+wearWhere:"Your wardrobe",wearH:"Worn {n} times",wearLede:"Nothing in the factory changes, but every extra wear spreads the footprint thinner.",
+wearPanelH:"How many times will you wear it?",wearsO:"{n} wears",wearsAria:"Number of wears",perwearL:"kg CO₂e per wear",perwear5L:"if worn only 5 times",curveAria:"Footprint per wear falls as the garment is worn more often",
+useWhere:"The washing machine",useH:"{n} washes at {t} °C",useHdry:"{n} washes at {t} °C, tumble dried",
+useLede:"Washing it over its life adds {kg} and {L} of water.",useLedeDry:"Washing it over its life adds {kg} and {L} of water. The dryer uses more energy than the wash itself.",
+usePanelH:"How you wash it",washedAfter:"Washed after",wpw1:"each wear",wpw3:"3 wears",wpw5:"5 wears",dryer:"Tumble dryer",tempAria:"Wash temperature",
+fWater:"water over its life",fMpWash:"microfibres shed per wash",fMpLife:"over its life",fNoMp:"plastic microfibres: no synthetic fibre",
+eolWhere:"After the last wear",eolHmix:"Like most clothes in Europe",eolMix:"About half goes to landfill, 40% is burned and 11% is recycled. ",
+eolLede:"That adds {kg}.",eolLedeSyn:"That adds {kg}. Burning the plastic part releases its fossil carbon.",
+eolPanelH:"Where it ends up",eolSub:"No route gets credit for a second owner or for fibre saved, so these figures only count the handling.",
+E_mix:"Typical EU mix",E_landfill:"Landfill",E_incin:"Incineration",E_recycle:"Recycling",E_resale:"Resale or donation",
+endWhere:"The whole life",endH:"{kg} CO₂e, about {km} km in a petrol car",
+leverBest:"The biggest single saving: {what} would cut {kg} kg ({p}%). ",leverFib:"switching the main fibre to {f}",leverCtry:"making it in {c}",leverSea:"shipping it instead of flying",
+leverLow:"This is already close to the lowest version of this garment. ",leverWear:"And the one that costs nothing: wearing it {n2} times instead of {n} halves its footprint per wear, to {x} kg.",
+again:"Follow another garment",readOwn:"Read your own label",openCalc:"Open the full calculator",
+endNote:"Figures use the same factors as the calculator on The Honest Tag (Data & Assumptions page). Freight uses typical route distances, so it can differ slightly from the full calculator.",
+noChange:"no change",tagAria:"Honest tag",tagH:"Environmental data",
+R_raw:"Raw materials",R_yarn:"Yarn & fabric",R_wet:"Dyeing & finishing",R_asm:"Sewing & packing",R_fr:"Freight",R_use:"Washing",R_eol:"End of life",
+water:"litres of water",mp:"microfibres per wash",yourG:"Your garment",waiting:"Waiting for the label",
+footStart:"The tag fills in as you follow the garment.",footSoFar:"So far: the stages you have passed.",footAll:"Whole life, cradle to grave · {n} wears · {x} kg per wear",
+show:"Show tag",hide:"Hide tag",
+G_tshirt:"T-shirt",G_jeans:"Jeans",G_hoodie:"Hoodie",G_leggings:"Leggings",G_shirt:"Shirt",G_sweater:"Sweater",
+F_cotton:"Cotton",F_rcotton:"Recycled cotton",F_ocotton:"Organic cotton",F_poly:"Polyester",F_rpoly:"Recycled polyester",F_viscose:"Viscose",F_lyocell:"Lyocell (Tencel)",F_linen:"Linen",F_wool:"Wool",F_nylon:"Nylon",F_elastane:"Elastane",
+C_bangladesh:"Bangladesh",C_china:"China",C_india:"India",C_vietnam:"Vietnam",C_turkey:"Turkey",C_italy:"Italy",C_portugal:"Portugal",
+lower:true},
+it:{
+title:"The Honest Tag – Segui un capo",tabFollow:"Segui un capo",tabRead:"Leggi l’etichetta",tabCalc:"Calcolatore",langAria:"Lingua",
+h0:"Segui un capo, dal campo al cassonetto.",p0:"Scegline uno e scorri verso il basso. A ogni tappa puoi cambiare una scelta e vedere cambiare la sua etichetta onesta.",
+holding:"Ne hai uno in mano? {link} e segui quel capo.",holdingLink:"Leggi la sua etichetta",
+h1:"Leggi l’etichetta che hai in mano.",p1:"Copia quello che c’è scritto sull’etichetta di composizione. Seguiremo quel capo dal campo al cassonetto e scriveremo la sua etichetta onesta passo dopo passo.",
+careLabel:"Cosa dice l’etichetta?",placeholder:"60% cotone, 40% poliestere\nProdotto in Bangladesh",
+careHint:"Le fibre con le percentuali e il paese dopo «Made in». Funziona in italiano, inglese, spagnolo o tedesco.",
+examplesAria:"Etichette di esempio",
+ex:[["100% Cotone\nMade in Bangladesh","100% cotone, Bangladesh"],["82% Poliestere 18% Elastan\nMade in China","Leggings, Cina"],["100% Lino\nMade in Italy","100% lino, Italia"],["65% Cotone riciclato, 35% poliestere riciclato\nMade in Portugal","Misto riciclato, Portogallo"]],
+whatKind:"Che tipo di capo è?",go:"Segui questo capo",goEmpty:"Scrivi un’etichetta o scegli un esempio.",goNoFibre:"Nessuna fibra trovata. Prova «100% cotone».",goOk:"{garment}, {g} g (peso tipico)",
+madeIn:"Prodotto in {c}",countryGuess:"Paese non trovato, uso {c}",unknown:"Non riconosciuto: {x}",unknownCountry:"«{x}» non è ancora nell’elenco.",
+scaledUnknown:"Le fibre non riconosciute sono escluse e il resto è riportato al 100%.",scaled:"Le percentuali non arrivavano a 100, quindi sono state riproporzionate.",fromLabel:"Dalla tua etichetta",
+whereField:"Nel campo",whereOil:"Dal petrolio al polimero",whereForest:"Dalla foresta alla cellulosa",whereFarm:"In fattoria",
+rawH:"{g} g di {blend}",rawLede:"Coltivare o produrre questa fibra rilascia {kg} e usa {L} di acqua.",rawLedeSyn:"Coltivare o produrre questa fibra rilascia {kg} e usa {L} di acqua, e la parte in plastica rilascerà microfibre a ogni lavaggio.",
+rawPanelH:"Stesso capo, fibra diversa",rawSub:"Cambia la fibra principale ({p}% del capo) e guarda cambiare tutta l’etichetta.",
+millWhere:"Filatura, tessitura, tintura e cucitura",millLede:"Trasformare la fibra in un capo finito aggiunge {kg}, di solito la parte più grande della sua impronta. Lì l’elettricità emette {g} g CO₂e per kWh, contro una media mondiale di {ref}.",
+millPanelH:"Dove è stato prodotto",millSub:"Qui la maggior parte dell’energia è elettrica, quindi la rete elettrica del paese cambia il risultato.",
+frWhere:"La spedizione verso l’Europa",frH_sea:"{km} km in nave portacontainer",frH_air:"{km} km in aereo",frH_road:"{km} km in camion",
+frLede:"Il viaggio fino a un negozio europeo aggiunge {kg}, {share} della sua intera vita.",lt1:"meno dell’1%",
+frPanelH:"Come ha viaggiato",frSub:"Le distanze sono rotte tipiche dalla fabbrica a una città europea.",
+M_sea:"Nave portacontainer",M_air:"Aereo",M_road:"Camion",noRoute:"Nessuna rotta via terra",
+frNote:"In aereo il trasporto emetterebbe circa {x} volte la CO₂ della nave. Le consegne espresse da lontano viaggiano per lo più in aereo.",
+wearWhere:"Il tuo armadio",wearH:"Indossato {n} volte",wearLede:"In fabbrica non cambia nulla, ma ogni utilizzo in più distribuisce l’impronta.",
+wearPanelH:"Quante volte lo indosserai?",wearsO:"{n} utilizzi",wearsAria:"Numero di utilizzi",perwearL:"kg CO₂e per utilizzo",perwear5L:"se indossato solo 5 volte",curveAria:"L’impronta per utilizzo scende quanto più spesso si indossa il capo",
+useWhere:"La lavatrice",useH:"{n} lavaggi a {t} °C",useHdry:"{n} lavaggi a {t} °C, con asciugatrice",
+useLede:"Lavarlo per tutta la sua vita aggiunge {kg} e {L} di acqua.",useLedeDry:"Lavarlo per tutta la sua vita aggiunge {kg} e {L} di acqua. L’asciugatrice consuma più energia del lavaggio stesso.",
+usePanelH:"Come lo lavi",washedAfter:"Lavato dopo",wpw1:"ogni utilizzo",wpw3:"3 utilizzi",wpw5:"5 utilizzi",dryer:"Asciugatrice",tempAria:"Temperatura di lavaggio",
+fWater:"acqua in tutta la sua vita",fMpWash:"microfibre rilasciate per lavaggio",fMpLife:"in tutta la sua vita",fNoMp:"microfibre di plastica: nessuna fibra sintetica",
+eolWhere:"Dopo l’ultimo utilizzo",eolHmix:"Come la maggior parte dei vestiti in Europa",eolMix:"Circa metà finisce in discarica, il 40% viene bruciato e l’11% riciclato. ",
+eolLede:"Questo aggiunge {kg}.",eolLedeSyn:"Questo aggiunge {kg}. Bruciare la parte in plastica libera il suo carbonio fossile.",
+eolPanelH:"Dove finisce",eolSub:"Nessun percorso riceve crediti per un secondo proprietario o per la fibra risparmiata: queste cifre contano solo la gestione.",
+E_mix:"Mix tipico UE",E_landfill:"Discarica",E_incin:"Incenerimento",E_recycle:"Riciclo",E_resale:"Rivendita o donazione",
+endWhere:"Tutta la vita",endH:"{kg} CO₂e, circa {km} km in un’auto a benzina",
+leverBest:"Il risparmio più grande: {what} ridurrebbe l’impronta di {kg} kg ({p}%). ",leverFib:"passare a {f} come fibra principale",leverCtry:"produrlo in {c}",leverSea:"spedirlo in nave invece che in aereo",
+leverLow:"È già vicino alla versione più leggera di questo capo. ",leverWear:"E quello gratuito: indossarlo {n2} volte invece di {n} dimezza la sua impronta per utilizzo, a {x} kg.",
+again:"Segui un altro capo",readOwn:"Leggi la tua etichetta",openCalc:"Apri il calcolatore completo",
+endNote:"Le cifre usano gli stessi fattori del calcolatore di The Honest Tag (pagina Metodologia). Il trasporto usa distanze di rotte tipiche, quindi può differire leggermente dal calcolatore completo.",
+noChange:"nessuna variazione",tagAria:"Etichetta onesta",tagH:"Valori ambientali",
+R_raw:"Materie prime",R_yarn:"Filato e tessuto",R_wet:"Tintura e finissaggio",R_asm:"Cucitura e imballaggio",R_fr:"Trasporto",R_use:"Lavaggi",R_eol:"Fine vita",
+water:"litri di acqua",mp:"microfibre per lavaggio",yourG:"Il tuo capo",waiting:"In attesa dell’etichetta",
+footStart:"L’etichetta si compila mentre segui il capo.",footSoFar:"Finora: le fasi che hai superato.",footAll:"Intera vita, dalla culla alla tomba · {n} utilizzi · {x} kg per utilizzo",
+show:"Mostra etichetta",hide:"Nascondi etichetta",
+G_tshirt:"T-shirt",G_jeans:"Jeans",G_hoodie:"Felpa",G_leggings:"Leggings",G_shirt:"Camicia",G_sweater:"Maglione",
+F_cotton:"Cotone",F_rcotton:"Cotone riciclato",F_ocotton:"Cotone biologico",F_poly:"Poliestere",F_rpoly:"Poliestere riciclato",F_viscose:"Viscosa",F_lyocell:"Lyocell (Tencel)",F_linen:"Lino",F_wool:"Lana",F_nylon:"Nylon",F_elastane:"Elastan",
+C_bangladesh:"Bangladesh",C_china:"Cina",C_india:"India",C_vietnam:"Vietnam",C_turkey:"Turchia",C_italy:"Italia",C_portugal:"Portogallo",
+lower:true},
+es:{
+title:"The Honest Tag – Sigue una prenda",tabFollow:"Sigue una prenda",tabRead:"Lee tu etiqueta",tabCalc:"Calculadora",langAria:"Idioma",
+h0:"Sigue una prenda, del campo a la basura.",p0:"Elige una y desplázate hacia abajo. En cada parada puedes cambiar una decisión y ver cómo cambia su etiqueta honesta.",
+holding:"¿Tienes una en la mano? {link} y sigue esa prenda.",holdingLink:"Lee su etiqueta",
+h1:"Lee la etiqueta que tienes en la mano.",p1:"Copia lo que dice la etiqueta de composición. Seguiremos esa prenda del campo a la basura y escribiremos su etiqueta honesta sobre la marcha.",
+careLabel:"¿Qué dice la etiqueta?",placeholder:"60% algodón, 40% poliéster\nHecho en Bangladés",
+careHint:"Las fibras con sus porcentajes y el país después de «Made in». Funciona en español, inglés, italiano o alemán.",
+examplesAria:"Etiquetas de ejemplo",
+ex:[["100% Algodón\nMade in Bangladesh","100% algodón, Bangladés"],["82% Poliéster 18% Elastano\nMade in China","Leggings, China"],["100% Lino\nMade in Italy","100% lino, Italia"],["65% Algodón reciclado, 35% poliéster reciclado\nMade in Portugal","Mezcla reciclada, Portugal"]],
+whatKind:"¿Qué tipo de prenda es?",go:"Seguir esta prenda",goEmpty:"Escribe una etiqueta o elige un ejemplo.",goNoFibre:"Aún no hay ninguna fibra. Prueba «100% algodón».",goOk:"{garment}, {g} g (peso típico)",
+madeIn:"Hecho en {c}",countryGuess:"País no encontrado, se usa {c}",unknown:"No reconocido: {x}",unknownCountry:"«{x}» aún no está en la lista.",
+scaledUnknown:"Las fibras no reconocidas se dejan fuera y el resto se ajusta al 100%.",scaled:"Los porcentajes no sumaban 100, así que se han ajustado.",fromLabel:"De tu etiqueta",
+whereField:"En el campo",whereOil:"Del petróleo al polímero",whereForest:"Del bosque a la pulpa",whereFarm:"En la granja",
+rawH:"{g} g de {blend}",rawLede:"Cultivar o fabricar esta fibra emite {kg} y usa {L} de agua.",rawLedeSyn:"Cultivar o fabricar esta fibra emite {kg} y usa {L} de agua, y la parte de plástico soltará microfibras en cada lavado.",
+rawPanelH:"La misma prenda, otra fibra",rawSub:"Cambia la fibra principal ({p}% de la prenda) y mira cómo cambia toda la etiqueta.",
+millWhere:"Hilatura, tejido, tintura y confección",millLede:"Convertir la fibra en una prenda terminada añade {kg}, normalmente la mayor parte de su huella. Allí la electricidad emite {g} g CO₂e por kWh, frente a una media mundial de {ref}.",
+millPanelH:"Dónde se fabricó",millSub:"Aquí la mayor parte de la energía es electricidad, así que la red eléctrica del país cambia el resultado.",
+frWhere:"El envío a Europa",frH_sea:"{km} km en buque portacontenedores",frH_air:"{km} km en avión",frH_road:"{km} km en camión",
+frLede:"El viaje hasta una tienda europea añade {kg}, {share} de toda su vida.",lt1:"menos del 1%",
+frPanelH:"Cómo viajó",frSub:"Las distancias son rutas típicas desde la fábrica hasta una ciudad europea.",
+M_sea:"Buque portacontenedores",M_air:"Avión",M_road:"Camión",noRoute:"Sin ruta terrestre",
+frNote:"En avión, el transporte emitiría unas {x} veces más CO₂ que en barco. Los envíos exprés desde lejos viajan casi siempre en avión.",
+wearWhere:"Tu armario",wearH:"Usada {n} veces",wearLede:"En la fábrica no cambia nada, pero cada uso extra reparte más la huella.",
+wearPanelH:"¿Cuántas veces la usarás?",wearsO:"{n} usos",wearsAria:"Número de usos",perwearL:"kg CO₂e por uso",perwear5L:"si solo se usa 5 veces",curveAria:"La huella por uso baja cuanto más se usa la prenda",
+useWhere:"La lavadora",useH:"{n} lavados a {t} °C",useHdry:"{n} lavados a {t} °C, con secadora",
+useLede:"Lavarla durante toda su vida añade {kg} y {L} de agua.",useLedeDry:"Lavarla durante toda su vida añade {kg} y {L} de agua. La secadora gasta más energía que el propio lavado.",
+usePanelH:"Cómo la lavas",washedAfter:"Se lava tras",wpw1:"cada uso",wpw3:"3 usos",wpw5:"5 usos",dryer:"Secadora",tempAria:"Temperatura de lavado",
+fWater:"agua a lo largo de su vida",fMpWash:"microfibras por lavado",fMpLife:"a lo largo de su vida",fNoMp:"microfibras de plástico: sin fibra sintética",
+eolWhere:"Después del último uso",eolHmix:"Como la mayoría de la ropa en Europa",eolMix:"Cerca de la mitad acaba en vertedero, el 40% se quema y el 11% se recicla. ",
+eolLede:"Eso añade {kg}.",eolLedeSyn:"Eso añade {kg}. Quemar la parte de plástico libera su carbono fósil.",
+eolPanelH:"Dónde termina",eolSub:"Ninguna ruta recibe crédito por un segundo dueño ni por la fibra ahorrada, así que estas cifras solo cuentan la gestión.",
+E_mix:"Mezcla típica UE",E_landfill:"Vertedero",E_incin:"Incineración",E_recycle:"Reciclaje",E_resale:"Reventa o donación",
+endWhere:"Toda su vida",endH:"{kg} CO₂e, unos {km} km en un coche de gasolina",
+leverBest:"El mayor ahorro posible: {what} reduciría la huella en {kg} kg ({p}%). ",leverFib:"cambiar la fibra principal a {f}",leverCtry:"fabricarla en {c}",leverSea:"enviarla en barco en vez de en avión",
+leverLow:"Ya está cerca de la versión más ligera de esta prenda. ",leverWear:"Y el que no cuesta nada: usarla {n2} veces en lugar de {n} reduce a la mitad su huella por uso, a {x} kg.",
+again:"Seguir otra prenda",readOwn:"Leer tu etiqueta",openCalc:"Abrir la calculadora completa",
+endNote:"Las cifras usan los mismos factores que la calculadora de The Honest Tag (página Metodología). El transporte usa distancias de rutas típicas, así que puede diferir un poco de la calculadora completa.",
+noChange:"sin cambios",tagAria:"Etiqueta honesta",tagH:"Datos ambientales",
+R_raw:"Materias primas",R_yarn:"Hilo y tejido",R_wet:"Tintura y acabado",R_asm:"Confección y embalaje",R_fr:"Transporte",R_use:"Lavados",R_eol:"Fin de vida",
+water:"litros de agua",mp:"microfibras por lavado",yourG:"Tu prenda",waiting:"Esperando la etiqueta",
+footStart:"La etiqueta se rellena a medida que sigues la prenda.",footSoFar:"Hasta ahora: las fases que has pasado.",footAll:"Toda la vida, de la cuna a la tumba · {n} usos · {x} kg por uso",
+show:"Ver etiqueta",hide:"Ocultar etiqueta",
+G_tshirt:"Camiseta",G_jeans:"Vaqueros",G_hoodie:"Sudadera",G_leggings:"Leggings",G_shirt:"Camisa",G_sweater:"Jersey",
+F_cotton:"Algodón",F_rcotton:"Algodón reciclado",F_ocotton:"Algodón orgánico",F_poly:"Poliéster",F_rpoly:"Poliéster reciclado",F_viscose:"Viscosa",F_lyocell:"Lyocell (Tencel)",F_linen:"Lino",F_wool:"Lana",F_nylon:"Nailon",F_elastane:"Elastano",
+C_bangladesh:"Bangladés",C_china:"China",C_india:"India",C_vietnam:"Vietnam",C_turkey:"Turquía",C_italy:"Italia",C_portugal:"Portugal",
+lower:true},
+de:{
+title:"The Honest Tag – Kleidungsstück verfolgen",tabFollow:"Kleidung verfolgen",tabRead:"Etikett lesen",tabCalc:"Rechner",langAria:"Sprache",
+h0:"Folge einem Kleidungsstück vom Feld bis in die Tonne.",p0:"Wähle eines aus und scrolle nach unten. An jeder Station kannst du eine Entscheidung ändern und sehen, wie sich sein ehrliches Etikett verändert.",
+holding:"Hast du eines in der Hand? {link} und folge diesem Kleidungsstück.",holdingLink:"Lies sein Etikett",
+h1:"Lies das Etikett in deiner Hand.",p1:"Schreib ab, was auf dem Pflegeetikett steht. Wir folgen diesem Kleidungsstück vom Feld bis in die Tonne und schreiben dabei sein ehrliches Etikett.",
+careLabel:"Was steht auf dem Etikett?",placeholder:"60% Baumwolle, 40% Polyester\nHergestellt in Bangladesch",
+careHint:"Fasern mit Prozentangaben und das Land nach „Made in“. Deutsch, Englisch, Italienisch oder Spanisch funktionieren.",
+examplesAria:"Beispieletiketten",
+ex:[["100% Baumwolle\nMade in Bangladesh","100% Baumwolle, Bangladesch"],["82% Polyester 18% Elasthan\nMade in China","Leggings, China"],["100% Leinen\nMade in Italy","100% Leinen, Italien"],["65% Recycelte Baumwolle, 35% recyceltes Polyester\nMade in Portugal","Recycelte Mischung, Portugal"]],
+whatKind:"Was für ein Kleidungsstück ist es?",go:"Diesem Kleidungsstück folgen",goEmpty:"Gib ein Etikett ein oder wähle ein Beispiel.",goNoFibre:"Noch keine Faser gefunden. Versuche „100% Baumwolle“.",goOk:"{garment}, {g} g (typisches Gewicht)",
+madeIn:"Hergestellt in {c}",countryGuess:"Land nicht gefunden, verwendet wird {c}",unknown:"Nicht erkannt: {x}",unknownCountry:"„{x}“ ist noch nicht in der Liste.",
+scaledUnknown:"Nicht erkannte Fasern werden weggelassen, der Rest wird auf 100% hochgerechnet.",scaled:"Die Prozentangaben ergaben nicht 100, daher wurden sie angepasst.",fromLabel:"Von deinem Etikett",
+whereField:"Auf dem Feld",whereOil:"Vom Erdöl zum Polymer",whereForest:"Vom Wald zum Zellstoff",whereFarm:"Auf dem Hof",
+rawH:"{g} g {blend}",rawLede:"Anbau oder Herstellung dieser Faser verursachen {kg} und verbrauchen {L} Wasser.",rawLedeSyn:"Anbau oder Herstellung dieser Faser verursachen {kg} und verbrauchen {L} Wasser, und der Kunststoffanteil gibt bei jeder Wäsche Mikrofasern ab.",
+rawPanelH:"Gleiches Kleidungsstück, andere Faser",rawSub:"Tausche die Hauptfaser ({p}% des Kleidungsstücks) und sieh, wie sich das ganze Etikett ändert.",
+millWhere:"Spinnen, Weben, Färben und Nähen",millLede:"Aus der Faser ein fertiges Kleidungsstück zu machen, verursacht {kg} – meist der größte Teil seines Fußabdrucks. Der Strom dort verursacht {g} g CO₂e pro kWh, gegenüber einem weltweiten Durchschnitt von {ref}.",
+millPanelH:"Wo es hergestellt wurde",millSub:"Hier ist der Großteil der Energie Strom, daher verändert das Stromnetz des Landes das Ergebnis.",
+frWhere:"Der Transport nach Europa",frH_sea:"{km} km per Containerschiff",frH_air:"{km} km per Luftfracht",frH_road:"{km} km per Lkw",
+frLede:"Der Weg bis in ein europäisches Geschäft verursacht {kg}, {share} seines gesamten Lebenszyklus.",lt1:"weniger als 1%",
+frPanelH:"Wie es gereist ist",frSub:"Die Entfernungen sind typische Routen von der Fabrik in eine europäische Stadt.",
+M_sea:"Containerschiff",M_air:"Luftfracht",M_road:"Lkw",noRoute:"Keine Landroute",
+frNote:"Per Flugzeug würde der Transport etwa {x}-mal so viel CO₂ verursachen wie per Schiff. Expresslieferungen aus der Ferne kommen meist per Flugzeug.",
+wearWhere:"Dein Kleiderschrank",wearH:"{n}-mal getragen",wearLede:"In der Fabrik ändert sich nichts, aber jedes weitere Tragen verteilt den Fußabdruck dünner.",
+wearPanelH:"Wie oft wirst du es tragen?",wearsO:"{n}-mal",wearsAria:"Anzahl der Tragen",perwearL:"kg CO₂e pro Tragen",perwear5L:"wenn nur 5-mal getragen",curveAria:"Der Fußabdruck pro Tragen sinkt, je öfter das Kleidungsstück getragen wird",
+useWhere:"Die Waschmaschine",useH:"{n} Wäschen bei {t} °C",useHdry:"{n} Wäschen bei {t} °C, im Trockner getrocknet",
+useLede:"Das Waschen über die Lebensdauer verursacht {kg} und verbraucht {L} Wasser.",useLedeDry:"Das Waschen über die Lebensdauer verursacht {kg} und verbraucht {L} Wasser. Der Trockner braucht mehr Energie als die Wäsche selbst.",
+usePanelH:"Wie du es wäschst",washedAfter:"Gewaschen nach",wpw1:"jedem Tragen",wpw3:"3-mal Tragen",wpw5:"5-mal Tragen",dryer:"Wäschetrockner",tempAria:"Waschtemperatur",
+fWater:"Wasser über die Lebensdauer",fMpWash:"Mikrofasern pro Wäsche",fMpLife:"über die Lebensdauer",fNoMp:"Mikroplastik-Fasern: keine Kunstfaser",
+eolWhere:"Nach dem letzten Tragen",eolHmix:"Wie die meiste Kleidung in Europa",eolMix:"Etwa die Hälfte landet auf der Deponie, 40% werden verbrannt und 11% recycelt. ",
+eolLede:"Das verursacht {kg}.",eolLedeSyn:"Das verursacht {kg}. Beim Verbrennen setzt der Kunststoffanteil seinen fossilen Kohlenstoff frei.",
+eolPanelH:"Wo es landet",eolSub:"Kein Weg erhält eine Gutschrift für einen zweiten Besitzer oder eingesparte Fasern; diese Werte zählen nur die Entsorgung.",
+E_mix:"Typischer EU-Mix",E_landfill:"Deponie",E_incin:"Verbrennung",E_recycle:"Recycling",E_resale:"Wiederverkauf oder Spende",
+endWhere:"Das ganze Leben",endH:"{kg} CO₂e, etwa {km} km mit einem Benzin-Pkw",
+leverBest:"Die größte einzelne Einsparung bringt {what}: {kg} kg weniger ({p}%). ",leverFib:"ein Wechsel der Hauptfaser auf „{f}“",leverCtry:"die Herstellung in {c}",leverSea:"der Versand per Schiff statt per Flugzeug",
+leverLow:"Das ist schon nahe an der sparsamsten Version dieses Kleidungsstücks. ",leverWear:"Und die kostenlose: {n2}-mal statt {n}-mal tragen halbiert den Fußabdruck pro Tragen auf {x} kg.",
+again:"Einem anderen Kleidungsstück folgen",readOwn:"Eigenes Etikett lesen",openCalc:"Ausführlichen Rechner öffnen",
+endNote:"Die Werte nutzen dieselben Faktoren wie der Rechner von The Honest Tag (Seite Daten & Annahmen). Der Transport nutzt typische Routenentfernungen und kann daher leicht vom ausführlichen Rechner abweichen.",
+noChange:"keine Änderung",tagAria:"Ehrliches Etikett",tagH:"Umweltdaten",
+R_raw:"Rohstoffe",R_yarn:"Garn & Stoff",R_wet:"Färben & Ausrüsten",R_asm:"Nähen & Verpacken",R_fr:"Fracht",R_use:"Waschen",R_eol:"Lebensende",
+water:"Liter Wasser",mp:"Mikrofasern pro Wäsche",yourG:"Dein Kleidungsstück",waiting:"Wartet auf das Etikett",
+footStart:"Das Etikett füllt sich, während du dem Kleidungsstück folgst.",footSoFar:"Bisher: die Phasen, die du durchlaufen hast.",footAll:"Gesamtes Leben, von der Wiege bis zur Bahre · {n}-mal getragen · {x} kg pro Tragen",
+show:"Etikett zeigen",hide:"Etikett ausblenden",
+G_tshirt:"T-Shirt",G_jeans:"Jeans",G_hoodie:"Hoodie",G_leggings:"Leggings",G_shirt:"Hemd",G_sweater:"Pullover",
+F_cotton:"Baumwolle",F_rcotton:"Recycelte Baumwolle",F_ocotton:"Bio-Baumwolle",F_poly:"Polyester",F_rpoly:"Recyceltes Polyester",F_viscose:"Viskose",F_lyocell:"Lyocell (Tencel)",F_linen:"Leinen",F_wool:"Wolle",F_nylon:"Nylon",F_elastane:"Elasthan",
+C_bangladesh:"Bangladesch",C_china:"China",C_india:"Indien",C_vietnam:"Vietnam",C_turkey:"Türkei",C_italy:"Italien",C_portugal:"Portugal",
+CIN_turkey:"der Türkei",
+lower:false}
+};
+
+// ---- Language (shared with the calculator through localStorage "honesttag.lang") ----
+var LANGS=["en","it","es","de"],KEY="honesttag.lang";
+function navLang(){var n=(navigator.language||"").slice(0,2).toLowerCase();return LANGS.indexOf(n)>-1?n:"en";}
+var lang;try{var sv=localStorage.getItem(KEY);lang=LANGS.indexOf(sv)>-1?sv:navLang();}catch(e){lang=navLang();}
+window.htLang=lang;
+function t(k,v){var d=JL[lang],s=(d[k]!=null?d[k]:JL.en[k]);if(typeof s!=="string")return s;return v?s.replace(/\{(\w+)\}/g,function(m,n){return v[n]!=null?v[n]:m;}):s;}
+function nm(prefix,k){return t(prefix+k);}
+function inC(k){return lang==="de"&&JL.de["CIN_"+k]?JL.de["CIN_"+k]:nm("C_",k);}
+function low(s){return JL[lang].lower?s.charAt(0).toLowerCase()+s.slice(1):s;}
+function dec(s){return lang==="en"?s:s.replace(/[.,]/g,function(c){return c==="."?",":".";});}
+function f2(x){return x<0.005&&x>0?dec("<0.01"):dec(x.toFixed(2));}
+function fN(x){return dec(Math.round(x).toLocaleString("en-US"));}
+function kgB(x){return "<span class='big num'>"+f2(x)+" kg CO₂e</span>";}
+function LB(x){return "<span class='big num'>"+fN(x)+" "+(lang==="en"?"litres":lang==="it"?"litri":lang==="es"?"litros":"Liter")+"</span>";}
+
+// ---- Factors: the defaults of The Honest Tag calculator (Data & Assumptions) ----
+var FIB={cotton:{c:2.8,w:10000,mp:0},rcotton:{c:0.4,w:500,mp:0},ocotton:{c:1.7,w:2400,mp:0},poly:{c:4.1,w:250,mp:1900},rpoly:{c:1.3,w:120,mp:2100},viscose:{c:5.9,w:300,mp:0},lyocell:{c:3.2,w:80,mp:0},linen:{c:0.8,w:400,mp:0},wool:{c:24.1,w:4500,mp:0},nylon:{c:15.4,w:700,mp:2400},elastane:{c:17,w:350,mp:1200}};
+var GRID_REF=458;
+var CTRY={bangladesh:{g:696,sea:15290,air:8580},china:{g:525,sea:20290,air:10120},india:{g:670,sea:14290,air:7650},vietnam:{g:463,sea:18790,air:10980},turkey:{g:476,sea:7540,air:2540,road:3080},italy:{g:285,sea:5655,air:1080,road:1230},portugal:{g:128,sea:2490,air:2330,road:2380}};
+var MODE={sea:{f:0.016,truck:300},air:{f:0.49,truck:100},road:{f:0.107,truck:0}};
+var GAR={tshirt:{w:0.22,blend:[["cotton",100]],o:"bangladesh",m:"sea"},jeans:{w:0.65,blend:[["cotton",98],["elastane",2]],o:"bangladesh",m:"sea"},hoodie:{w:0.55,blend:[["cotton",80],["poly",20]],o:"china",m:"sea"},leggings:{w:0.24,blend:[["poly",82],["elastane",18]],o:"china",m:"sea"},shirt:{w:0.19,blend:[["linen",100]],o:"italy",m:"road"},sweater:{w:0.48,blend:[["rcotton",65],["rpoly",35]],o:"china",m:"sea"}};
+var PROC=21,SH={yarn:41/85,wet:37/85,asm:7/85},ES={yarn:.85,wet:.25,asm:.9};
+var LOAD=3.4,WATERW=50,EN={30:.4,40:.6,60:.9},DRY=2,GRIDH=0.21,CAR=0.163;
+var EOLS=["mix","landfill","incin","recycle","resale"];
+
+var st={g:"tshirt",blend:[["cotton",100]],o:"bangladesh",m:"sea",wears:30,wpw:3,temp:40,dry:false,eol:"mix",read:false};
+function synShare(b){var s=0;b.forEach(function(x){if(FIB[x[0]].mp>0)s+=x[1];});return s/100;}
+function calc(s){
+  var kg=GAR[s.g].w,c=CTRY[s.o],r=c.g/GRID_REF,raw=0,water=0,mpPerG=0;
+  s.blend.forEach(function(x){var f=FIB[x[0]],p=x[1]/100;raw+=kg*p*f.c;water+=kg*p*f.w;mpPerG+=p*f.mp;});
+  var base=kg*PROC,yarn=base*SH.yarn*(1+ES.yarn*(r-1)),wet=base*SH.wet*(1+ES.wet*(r-1)),asm=base*SH.asm*(1+ES.asm*(r-1));
+  var mode=s.m;if(mode==="road"&&!c.road)mode="sea";
+  var km=c[mode],M=MODE[mode];
+  var fr=mode==="road"?kg/1000*km*M.f:kg/1000*(km*M.f+M.truck*MODE.road.f);
+  var washes=s.wears/s.wpw,share=kg/LOAD,use=washes*share*((EN[s.temp]+(s.dry?DRY:0))*GRIDH),useW=washes*share*WATERW;
+  var ss=synShare(s.blend),ef={landfill:.497,incin:.0064+ss*2.3,recycle:.0064,resale:.0064};ef.mix=.49*ef.landfill+.40*ef.incin+.11*ef.recycle;
+  var eol=kg*ef[s.eol],stages={raw:raw,yarn:yarn,wet:wet,asm:asm,fr:fr,use:use,eol:eol};
+  return {stages:stages,total:raw+yarn+wet+asm+fr+use+eol,mill:yarn+wet+asm,water:water+useW,useW:useW,mpWash:Math.round(kg*1000*mpPerG),washes:washes,km:km,mode:mode};
+}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function with_(k,v){var s=clone(st);s[k]=v;return s;}
+function dlt(a,b){var d=b-a;if(Math.abs(d)<0.005)return '<span class="d same num">'+t("noChange")+'</span>';return '<span class="d num '+(d>0?"up":"down")+'">'+(d>0?"+":"−")+dec(Math.abs(d).toFixed(2))+' kg</span>';}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function blendText(b){return b.map(function(x){return dec(String(x[1]))+"% "+low(nm("F_",x[0]));}).join(", ");}
+
+// ---- Label reader (understands EN, IT, ES, DE, FR words) ----
+function norm(x){return x.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ß/g,"ss");}
+var FW=[["rcotton",/(recycled cotton|cotone riciclato|algodon reciclado|recycelte baumwolle|recycling-?baumwolle|baumwolle recycelt|coton recycle)/],["ocotton",/(organic cotton|cotone biologico|cotone organico|algodon organico|bio-?baumwolle|biobaumwolle|coton bio)/],["rpoly",/(recycled polyester|poliestere riciclato|poliester reciclado|recyceltes polyester|polyester recycle|rpet)/],["elastane",/(elastane|elastan|elastomero|spandex|lycra|elasthan)/],["nylon",/(nylon|nailon|polyamide|poliammide|poliamida|polyamid)/],["lyocell",/(lyocell|tencel)/],["viscose",/(viscose|viscosa|viskose|rayon)/],["linen",/(linen|flax|lino|leinen|flachs|\blin\b)/],["wool",/(\bwool|\blana\b|\bwolle|\blaine\b|merino)/],["poly",/(polyester|poliestere|poliester)/],["cotton",/(cotton|cotone|algodon|baumwolle|coton)/]];
+var CW=[["bangladesh",/bangla/],["china",/(china|cina|chine|prc)/],["india",/(india|indien|inde\b)/],["vietnam",/viet/],["turkey",/(turkey|turkiye|turchia|turquia|turkei|turquie)/],["italy",/(italy|italia|italien|italie)/],["portugal",/(portugal|portogallo)/]];
+var GW=[["jeans",/(jeans|denim|vaquero)/],["hoodie",/(hoodie|sweatshirt|felpa|sudadera|kapuzen)/],["leggings",/legging/],["sweater",/(sweater|jumper|pullover|maglione|jersey|cardigan)/],["shirt",/(shirt|camicia|camisa|hemd|blouse)/],["tshirt",/(t-?shirt|tee|maglietta|camiseta)/]];
+var MADE=/(made in|prodotto in|fabbricato in|hecho en|fabricado en|hergestellt in|fabrique en)/;
+function fibreOf(w){for(var i=0;i<FW.length;i++)if(FW[i][1].test(w))return FW[i][0];return null;}
+function parse(text){
+  var x=norm(text),out={blend:[],o:null,g:null,unknown:[]};
+  var pieces=x.replace(new RegExp(MADE.source+"[^\\n,.;]*","g")," ").split(/[\n,;\/+]|\band\b|\be\b|\by\b|\bund\b|\bet\b/),seen={};
+  pieces.forEach(function(p){
+    if(!/\d\s*%/.test(p))return;
+    var pairs=p.trim().match(/\d{1,3}(?:[.,]\d+)?\s*%\s*[a-z][a-z\- ]*|[a-z][a-z\- ]*\s*\d{1,3}(?:[.,]\d+)?\s*%/g)||[];
+    pairs.forEach(function(q){var mm=q.match(/(\d{1,3}(?:[.,]\d+)?)\s*%/);if(!mm)return;var f=fibreOf(q.replace(mm[0]," "));
+      if(f)seen[f]=(seen[f]||0)+parseFloat(mm[1].replace(",","."));else{var w=q.replace(mm[0],"").trim();if(w)out.unknown.push(w);}});
+  });
+  if(!Object.keys(seen).length){var f=fibreOf(x.replace(new RegExp(MADE.source+".*$","m"),""));if(f)seen[f]=100;}
+  var sum=0,k;for(k in seen)sum+=seen[k];
+  if(sum>0)for(k in seen)out.blend.push([k,Math.round(seen[k]/sum*1000)/10]);
+  out.blend.sort(function(a,b){return b[1]-a[1];});
+  out.sumOff=sum>0&&Math.abs(sum-100)>0.5;
+  for(var i=0;i<CW.length;i++)if(CW[i][1].test(x)){out.o=CW[i][0];break;}
+  if(!out.o){var mc=x.match(new RegExp(MADE.source+"\\s+([a-z ]+)"));if(mc)out.unknownCountry=mc[2].trim();}
+  for(var j=0;j<GW.length;j++)if(GW[j][1].test(x)){out.g=GW[j][0];break;}
+  return out;
+}
+
+// ---- Static text ----
+function applyStatic(){
+  document.documentElement.lang=lang;document.title=t("title");
+  document.querySelectorAll("[data-t]").forEach(function(e){e.textContent=t(e.getAttribute("data-t"));});
+  document.querySelectorAll("[data-i]").forEach(function(e){var p=e.getAttribute("data-i").split(":");e.setAttribute(p[0],t(p[1]));});
+  document.getElementById("tagtext").placeholder=t("placeholder");
+  var h=document.getElementById("holding");h.innerHTML="";var parts=t("holding").split("{link}");
+  h.appendChild(document.createTextNode(parts[0]));var b=document.createElement("button");b.type="button";b.className="textlink";b.setAttribute("data-goview","read");b.textContent=t("holdingLink");h.appendChild(b);h.appendChild(document.createTextNode(parts[1]||""));
+  var ex=document.getElementById("examples");ex.setAttribute("aria-label",t("examplesAria"));ex.innerHTML="";
+  t("ex").forEach(function(e){var bb=document.createElement("button");bb.type="button";bb.textContent=e[1];bb.onclick=function(){ta.value=e[0];garChosen=null;renderHero();ta.focus();};ex.appendChild(bb);});
+  var L=document.getElementById("langs");L.setAttribute("aria-label",t("langAria"));L.innerHTML="";
+  LANGS.forEach(function(l){var bb=document.createElement("button");bb.type="button";bb.lang=l;bb.textContent=l.toUpperCase();bb.setAttribute("aria-pressed",l===lang?"true":"false");bb.onclick=function(){setLang(l);};L.appendChild(bb);});
+  garB.innerHTML="";Object.keys(GAR).forEach(function(k){var bb=document.createElement("button");bb.type="button";bb.textContent=nm("G_",k);bb.dataset.g=k;bb.onclick=function(){garChosen=k;renderHero();};garB.appendChild(bb);});
+  document.getElementById("m-lab").textContent=t(tc.classList.contains("open")?"hide":"show");
+}
+function setLang(l){
+  lang=l;window.htLang=l;try{localStorage.setItem(KEY,l);}catch(e){}
+  applyStatic();renderHero();renderPicks();render(true);
+  try{window.dispatchEvent(new CustomEvent("ht-lang",{detail:l}));}catch(e){}
+}
+
+// ---- Read your tag ----
+var ta=document.getElementById("tagtext"),chips=document.getElementById("chips"),goB=document.getElementById("go"),goH=document.getElementById("gohint"),garB=document.getElementById("garments"),tc=document.getElementById("tagcol");
+var parsed=null,garChosen=null,readG="tshirt",fromLabel=null;
+ta.addEventListener("input",function(){renderHero();});
+function guessGarment(p){var f=p.blend.map(function(x){return x[0];});if(f.indexOf("elastane")>-1&&f.indexOf("poly")>-1)return "leggings";if(f[0]==="linen")return "shirt";if(f[0]==="wool")return "sweater";return null;}
+function renderHero(){
+  parsed=ta.value.trim()?parse(ta.value):null;
+  var g=garChosen||(parsed&&parsed.g)||(parsed&&guessGarment(parsed))||"tshirt";readG=g;
+  garB.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.g===g?"true":"false");});
+  var h="";
+  if(parsed){
+    parsed.blend.forEach(function(x){h+='<span class="chip ok"><b class="num">'+dec(String(x[1]))+'%</b> '+esc(nm("F_",x[0]))+'</span>';});
+    if(parsed.o)h+='<span class="chip ok">'+esc(t("madeIn",{c:inC(parsed.o)}))+'</span>';
+    else h+='<span class="chip guess">'+esc(t("countryGuess",{c:nm("C_",GAR[g].o)}))+'</span>';
+    if(parsed.unknown.length)h+='<span class="miss">'+esc(t("unknown",{x:parsed.unknown.join(", ")}))+'</span>';
+    if(parsed.unknownCountry)h+='<span class="miss">'+esc(t("unknownCountry",{x:parsed.unknownCountry}))+'</span>';
+    if(parsed.sumOff)h+='<span class="small">'+t(parsed.unknown.length?"scaledUnknown":"scaled")+'</span>';
+  }
+  chips.innerHTML=h;
+  var ok=parsed&&parsed.blend.length>0;goB.disabled=!ok;
+  goH.textContent=ok?t("goOk",{garment:nm("G_",g),g:Math.round(GAR[g].w*1000)}):t(parsed?"goNoFibre":"goEmpty");
+}
+function smooth(){return matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth";}
+function startGarment(g,blend,o,label){
+  st.g=g;st.blend=blend.map(function(x){return x.slice();});st.o=o;st.m=GAR[g].m;if(st.m==="road"&&!CTRY[st.o].road)st.m="sea";
+  st.wears=30;st.wpw=3;st.temp=40;st.dry=false;st.eol="mix";st.read=true;fromLabel=label||null;
+  document.getElementById("wears").value=30;last=null;renderPicks();render(true);onScroll();
+}
+goB.onclick=function(){
+  startGarment(readG,parsed.blend,parsed.o||GAR[readG].o,{g:readG,blend:parsed.blend,o:parsed.o||GAR[readG].o});
+  setView("follow");document.getElementById("s-raw").scrollIntoView({behavior:smooth(),block:"start"});
+};
+document.getElementById("again").onclick=function(){window.scrollTo({top:0,behavior:smooth()});};
+
+// ---- Views ----
+function setView(v){
+  document.body.dataset.view=v;
+  document.querySelectorAll(".tabs [data-view]").forEach(function(b){b.setAttribute("aria-selected",b.dataset.view===v?"true":"false");});
+  try{history.replaceState(null,"",v==="read"?"#read":location.pathname+location.search);}catch(e){}
+  if(v==="read")window.scrollTo(0,0);else onScroll();
+}
+document.addEventListener("click",function(e){var b=e.target.closest("[data-view],[data-goview]");if(!b)return;var v=b.dataset.view||b.dataset.goview;setView(v);if(v==="read")ta.focus();});
+
+// ---- Garment picker ----
+var picksEl=document.getElementById("picks");
+function renderPicks(){
+  var h="";
+  if(fromLabel)h+='<button type="button" class="pick" aria-pressed="true" data-pick="label"><span class="n">'+t("fromLabel")+'</span><span class="d">'+esc(nm("G_",fromLabel.g)+" · "+blendText(fromLabel.blend)+" · "+nm("C_",fromLabel.o))+'</span></button>';
+  Object.keys(GAR).forEach(function(k){var G=GAR[k];h+='<button type="button" class="pick" aria-pressed="'+(!fromLabel&&st.g===k?"true":"false")+'" data-pick="'+k+'"><span class="n">'+esc(nm("G_",k))+'</span><span class="d">'+esc(blendText(G.blend)+" · "+nm("C_",G.o))+'</span></button>';});
+  picksEl.innerHTML=h;
+}
+picksEl.addEventListener("click",function(e){var b=e.target.closest(".pick");if(!b||b.dataset.pick==="label")return;var k=b.dataset.pick,G=GAR[k];startGarment(k,G.blend,G.o,null);document.getElementById("s-raw").scrollIntoView({behavior:smooth(),block:"start"});});
+
+// ---- Journey ----
+var reached=0,last=null;
+var ROWS=[["raw","--s-raw",0],["yarn","--s-yarn",1],["wet","--s-wet",1],["asm","--s-asm",1],["fr","--s-fr",2],["use","--s-use",4],["eol","--s-eol",5]];
+function opt(label,deltaHtml,pressed,dis,data){return '<button type="button" class="opt" aria-pressed="'+(pressed?"true":"false")+'"'+(dis?" disabled":"")+' '+data+'><span class="n">'+esc(label)+'</span>'+deltaHtml+'</button>';}
+function segs(id,list,cur,fn){var el=document.getElementById(id);el.innerHTML="";list.forEach(function(x){var b=document.createElement("button");b.type="button";b.textContent=x[1];b.setAttribute("aria-pressed",x[0]===cur?"true":"false");b.onclick=function(){fn(x[0]);};el.appendChild(b);});}
+function mergeMain(s2,k){s2.blend[0]=[k,s2.blend[0][1]];var m={};s2.blend.forEach(function(x){m[x[0]]=(m[x[0]]||0)+x[1];});s2.blend=Object.keys(m).map(function(q){return [q,m[q]];}).sort(function(a,b){return b[1]-a[1];});return s2;}
+function render(fromChange){
+  var R=calc(st),c=st.o,syn=synShare(st.blend),main=st.blend[0];
+  var mf=main[0];
+  document.getElementById("raw-where").textContent=t(FIB[mf].mp>0?"whereOil":(mf==="viscose"||mf==="lyocell")?"whereForest":mf==="wool"?"whereFarm":"whereField");
+  document.getElementById("raw-h").textContent=t("rawH",{g:Math.round(GAR[st.g].w*1000),blend:blendText(st.blend)});
+  document.getElementById("raw-lede").innerHTML=t(syn>0?"rawLedeSyn":"rawLede",{kg:kgB(R.stages.raw),L:LB(R.water-R.useW)});
+  document.getElementById("raw-sub").textContent=t("rawSub",{p:dec(String(main[1]))});
+  var ro="";Object.keys(FIB).filter(function(k){return k!=="elastane";}).forEach(function(k){ro+=opt(nm("F_",k),dlt(R.total,calc(mergeMain(clone(st),k)).total),k===mf,false,'data-fib="'+k+'"');});
+  document.getElementById("raw-opts").innerHTML=ro;
+  document.getElementById("mill-h").textContent=t("madeIn",{c:inC(c)});
+  document.getElementById("mill-lede").innerHTML=t("millLede",{kg:kgB(R.mill),g:"<span class='num'>"+CTRY[c].g+"</span>",ref:"<span class='num'>"+GRID_REF+"</span>"});
+  var mo="";Object.keys(CTRY).forEach(function(k){var s2=with_("o",k);if(s2.m==="road"&&!CTRY[k].road)s2.m="sea";mo+=opt(nm("C_",k),dlt(R.total,calc(s2).total),k===c,false,'data-o="'+k+'"');});
+  document.getElementById("mill-opts").innerHTML=mo;
+  document.getElementById("fr-h").textContent=t("frH_"+R.mode,{km:fN(R.km)});
+  var sh=R.stages.fr/R.total<0.01?t("lt1"):Math.round(R.stages.fr/R.total*100)+"%";
+  document.getElementById("fr-lede").innerHTML=t("frLede",{kg:kgB(R.stages.fr),share:sh});
+  var fo="";["sea","air","road"].forEach(function(k){var dis=k==="road"&&!CTRY[c].road;fo+=opt(t("M_"+k),dis?'<span class="d same">'+t("noRoute")+'</span>':dlt(R.total,calc(with_("m",k)).total),k===R.mode,dis,'data-m="'+k+'"');});
+  document.getElementById("fr-opts").innerHTML=fo;
+  var air=calc(with_("m","air")).stages.fr,sea=calc(with_("m","sea")).stages.fr;
+  document.getElementById("fr-note").textContent=t("frNote",{x:Math.round(air/sea)});
+  document.getElementById("wear-h").textContent=t("wearH",{n:st.wears});
+  document.getElementById("wears-o").textContent=t("wearsO",{n:st.wears});
+  document.getElementById("perwear").textContent=dec((R.total/st.wears).toFixed(2));
+  document.getElementById("perwear5").textContent=dec((calc(with_("wears",5)).total/5).toFixed(2));
+  drawCurve(R.total);
+  document.getElementById("use-h").textContent=t(st.dry?"useHdry":"useH",{n:fN(R.washes),t:st.temp});
+  document.getElementById("use-lede").innerHTML=t(st.dry?"useLedeDry":"useLede",{kg:kgB(R.stages.use),L:LB(R.useW)});
+  var uf='<div class="fact"><div class="v num">'+fN(R.useW)+' L</div><div class="l">'+t("fWater")+'</div></div>';
+  if(R.mpWash>0)uf+='<div class="fact"><div class="v num">'+fN(R.mpWash)+'</div><div class="l">'+t("fMpWash")+'</div></div><div class="fact"><div class="v num">'+fN(R.mpWash*R.washes)+'</div><div class="l">'+t("fMpLife")+'</div></div>';
+  else uf+='<div class="fact"><div class="v num">0</div><div class="l">'+t("fNoMp")+'</div></div>';
+  document.getElementById("use-facts").innerHTML=uf;
+  segs("temp",[[30,"30 °C"],[40,"40 °C"],[60,"60 °C"]],st.temp,function(v){change("temp",v);});
+  segs("wpw",[[1,t("wpw1")],[3,t("wpw3")],[5,t("wpw5")]],st.wpw,function(v){change("wpw",v);});
+  document.getElementById("dryer").checked=st.dry;
+  document.getElementById("eol-h").textContent=st.eol==="mix"?t("eolHmix"):t("E_"+st.eol);
+  document.getElementById("eol-lede").innerHTML=(st.eol==="mix"?t("eolMix"):"")+t(syn>0?"eolLedeSyn":"eolLede",{kg:kgB(R.stages.eol)});
+  var eo="";EOLS.forEach(function(k){eo+=opt(t("E_"+k),dlt(R.total,calc(with_("eol",k)).total),k===st.eol,false,'data-eol="'+k+'"');});
+  document.getElementById("eol-opts").innerHTML=eo;
+  document.getElementById("end-h").textContent=t("endH",{kg:f2(R.total),km:fN(R.total/CAR)});
+  document.getElementById("lever").textContent=leverText(R);
+  renderTag(R,fromChange);
+}
+function leverText(R){
+  var tries=[];
+  Object.keys(FIB).forEach(function(k){if(k==="elastane")return;tries.push([t("leverFib",{f:low(nm("F_",k))}),calc(mergeMain(clone(st),k)).total]);});
+  Object.keys(CTRY).forEach(function(k){var s2=with_("o",k);if(s2.m==="road"&&!CTRY[k].road)s2.m="sea";tries.push([t("leverCtry",{c:inC(k)}),calc(s2).total]);});
+  if(st.m==="air")tries.push([t("leverSea"),calc(with_("m","sea")).total]);
+  var best=tries.sort(function(a,b){return a[1]-b[1];})[0],saved=R.total-best[1];
+  var s=saved>0.05?t("leverBest",{what:best[0],kg:dec(saved.toFixed(2)),p:Math.round(saved/R.total*100)}):t("leverLow");
+  return s+t("leverWear",{n2:st.wears*2,n:st.wears,x:dec((R.total/(st.wears*2)).toFixed(2))});
+}
+function drawCurve(tot){
+  var svg=document.getElementById("curve"),W=600,H=120,P=8,maxW=150,minW=5;
+  var y=function(w){return P+(1-(tot/w)/(tot/minW))*(H-2*P);},x=function(w){return P+(w-minW)/(maxW-minW)*(W-2*P);};
+  var pts=[];for(var w=minW;w<=maxW;w++)pts.push(x(w).toFixed(1)+" "+y(w).toFixed(1));
+  var cx=x(st.wears);
+  svg.innerHTML='<path d="M'+pts.join("L")+'" fill="none" stroke="var(--rule)" stroke-width="3" vector-effect="non-scaling-stroke"/><path d="M'+pts.slice(0,Math.max(1,st.wears-minW+1)).join("L")+'" fill="none" stroke="var(--s-use)" stroke-width="3" vector-effect="non-scaling-stroke"/><line x1="'+cx+'" x2="'+cx+'" y1="0" y2="'+H+'" stroke="var(--thread)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-dasharray="4 4"/>';
+}
+function renderTag(R,fromChange){
+  tc.classList.toggle("live",!!st.read);document.body.classList.toggle("has-bar",!!st.read);
+  document.getElementById("t-who").textContent=st.read?nm("G_",st.g):t("yourG");
+  document.getElementById("t-sub").textContent=st.read?blendText(st.blend)+" · "+nm("C_",st.o):t("waiting");
+  var vis=function(r){return st.read&&r[2]<=reached;},shown=0;ROWS.forEach(function(r){if(vis(r))shown+=R.stages[r[0]];});
+  var all=reached>=5,tot=all?R.total:shown;
+  var bar="";ROWS.forEach(function(r){bar+='<span style="width:'+(vis(r)?R.stages[r[0]]/R.total*100:0)+'%;background:var('+r[1]+')"></span>';});
+  document.getElementById("t-bar").innerHTML=bar;document.getElementById("m-bar").innerHTML=bar;
+  var rows="";ROWS.forEach(function(r){var v=vis(r),now=st.read&&r[2]===reached;rows+='<li class="'+(v?"":"todo")+(now?" now":"")+'"><span class="k"><i style="background:var('+r[1]+')"></i>'+t("R_"+r[0])+'</span><span class="v num">'+(v?f2(R.stages[r[0]]):"···")+'</span></li>';});
+  document.getElementById("t-rows").innerHTML=rows;
+  document.getElementById("t-total").textContent=st.read?f2(tot):"–";
+  document.getElementById("m-total").textContent=st.read?f2(tot):"–";
+  document.getElementById("t-water").textContent=st.read?fN(reached>=4?R.water:R.water-R.useW):"–";
+  document.getElementById("t-mp").textContent=st.read?fN(R.mpWash):"–";
+  document.getElementById("t-foot").textContent=!st.read?t("footStart"):all?t("footAll",{n:st.wears,x:dec((R.total/st.wears).toFixed(2))}):t("footSoFar");
+  if(fromChange==="choice"&&last!==null&&Math.abs(tot-last)>=0.005){
+    var dd=tot-last;[document.getElementById("t-delta"),document.getElementById("m-delta")].forEach(function(el){el.className="delta num show "+(dd>0?"up":"down");el.textContent=(dd>0?"+":"−")+dec(Math.abs(dd).toFixed(2))+" kg";clearTimeout(el._t);el._t=setTimeout(function(){el.className="delta num";},2600);});
+  }
+  last=tot;
+}
+function change(k,v){st[k]=v;render("choice");}
+document.getElementById("journey").addEventListener("click",function(e){
+  var b=e.target.closest(".opt");if(!b||b.disabled)return;
+  if(b.dataset.fib){mergeMain(st,b.dataset.fib);render("choice");}
+  else if(b.dataset.o){st.o=b.dataset.o;if(st.m==="road"&&!CTRY[st.o].road)st.m="sea";render("choice");}
+  else if(b.dataset.m)change("m",b.dataset.m);
+  else if(b.dataset.eol)change("eol",b.dataset.eol);
+});
+var wr=document.getElementById("wears");wr.addEventListener("input",function(){st.wears=+wr.value;render("choice");});
+document.getElementById("dryer").addEventListener("change",function(e){change("dry",e.target.checked);});
+
+// ---- Scroll: thread, needle, stages reached ----
+var stops=[].slice.call(document.querySelectorAll(".stop")),fill=document.getElementById("threadfill"),needle=document.getElementById("needle"),jr=document.getElementById("journey");
+function onScroll(){
+  if(document.body.dataset.view==="read")return;
+  var r=jr.getBoundingClientRect(),mark=window.innerHeight*0.55,p=Math.max(0,Math.min(r.height,mark-r.top));
+  fill.style.height=p+"px";needle.style.top=(p-7)+"px";
+  var idx=0;stops.forEach(function(s,i){var on=s.getBoundingClientRect().top<mark;s.classList.toggle("reached",on);if(on)idx=i;});
+  if(idx!==reached){reached=idx;renderTag(calc(st),true);}
+}
+addEventListener("scroll",onScroll,{passive:true});addEventListener("resize",onScroll);
+
+// ---- Phone: tag sheet ----
+var sb=document.getElementById("sheetbtn");
+sb.onclick=function(){var o=tc.classList.toggle("open");sb.setAttribute("aria-expanded",o);document.getElementById("m-lab").textContent=t(o?"hide":"show");};
+
+// ---- Start ----
+document.body.dataset.view="follow";
+applyStatic();renderHero();var G0=GAR.tshirt;startGarment("tshirt",G0.blend,G0.o,null);
+setView(location.hash==="#read"?"read":"follow");
+})();
+</script>
+
+</body>
+</html>
