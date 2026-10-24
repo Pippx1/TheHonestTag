@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/33901512/README.md)
 # TheHonestTag
 
 LCA Apparel Calculation Engine. Cradle-to-Grave
@@ -11,9 +10,11 @@ The Honest Tag estimates the environmental impact of garments (T-shirts, jeans, 
 
 | File | What it is |
 |---|---|
-| `index.html` | The website |
-| `app3.js` | The calculator and its data |
-| `ht-i18n.js` | Translations (IT, ES, DE) |
+| `index.html` | Home page: follow a garment from field to bin, and read your own label |
+| `calculator.html` | The full calculator |
+| `app3.js` | The calculator's code and data |
+| `ht-i18n.js` | Translations for the calculator (IT, ES, DE) |
 | `cookie-policy.html` | Cookie policy |
+| `README.md` | This file |
 
-All four files must sit side by side in the root of this repository.
+All files sit side by side in the root of this repository.
