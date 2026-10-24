@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Follow a garment from field to bin and see its honest environmental tag build up: carbon, water and microplastics at every stage.">
+<meta name="description" content="Follow a garment from cradle to grave and see its honest environmental tag build up: carbon, water and microplastics at every stage.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M14 22 L32 8 L50 22 V52 a4 4 0 0 1 -4 4 H18 a4 4 0 0 1 -4 -4 Z%27 stroke=%2314181F stroke-width=%275%27/%3E%3Ccircle cx=%2732%27 cy=%2722%27 r=%275%27 stroke=%23C8571F stroke-width=%275%27/%3E%3Cpath d=%27M24 38 H40 M24 46 H34%27 stroke=%2314181F stroke-width=%275%27/%3E%3C/svg%3E">
 <title>The Honest Tag</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -338,6 +338,9 @@ var e,t;e=this,t=function(e){'use strict';const t='opt-in',o='opt-out',n='show--
 }
 @media (max-width:900px){body.has-bar[data-view="follow"] #ht-cc-open{bottom:calc(74px + env(safe-area-inset-bottom,0px))}}
 @media print{.tabs,.langs,#ht-cc-open{display:none}}
+.term-en{font-size:clamp(12px,.3em,17px);font-weight:500;letter-spacing:0;color:var(--muted);font-style:italic;vertical-align:.9em;white-space:nowrap}
+.foot .term-en{font-size:1em;vertical-align:baseline}
+.nw{white-space:nowrap}@media (max-width:340px){.nw{white-space:normal}}
 @media (max-width:900px){.sheetbtn{gap:10px}.sheetbtn>span{white-space:nowrap;flex-shrink:0}.sheetbtn .mini{flex:1 1 auto;min-width:24px}}
 </style>
 <header class="top">
@@ -517,9 +520,9 @@ var e,t;e=this,t=function(e){'use strict';const t='opt-in',o='opt-out',n='show--
 var JL={
 en:{
 title:"The Honest Tag – Follow a garment",tabFollow:"Follow a garment",tabRead:"Read your tag",tabCalc:"Calculator",langAria:"Language",
-h0:"Follow a garment from field to bin.",p0:"Pick one and scroll down. At every stop you can change a choice and watch its honest tag change.",
+h0:"Create your Honest Tag, cradle to grave.",p0:"Pick a garment and scroll down. At every stop you can change a choice and watch its honest tag change.",
 holding:"Holding a real one? {link} and follow that garment instead.",holdingLink:"Read its label",
-h1:"Read the tag in your hand.",p1:"Copy what the care label says. We’ll follow that garment from the field to the bin and write its honest tag as you go.",
+h1:"Read the tag in your hand.",p1:"Copy what the care label says. We’ll follow that garment from cradle to grave and write its honest tag as you go.",
 careLabel:"What does the label say?",placeholder:"60% cotton, 40% polyester\nMade in Bangladesh",
 careHint:"Fibres with percentages, and the country after “Made in”. English, Italian, Spanish or German all work.",
 examplesAria:"Example labels",
@@ -528,12 +531,12 @@ whatKind:"What kind of garment is it?",go:"Follow this garment",goEmpty:"Type a 
 madeIn:"Made in {c}",countryGuess:"Country not found, using {c}",unknown:"Didn’t recognise: {x}",unknownCountry:"“{x}” isn’t in the list yet.",
 scaledUnknown:"Fibres we didn’t recognise are left out, and the rest is scaled up to 100%.",scaled:"Percentages didn’t add up to 100, so they were scaled.",fromLabel:"From your label",
 whereField:"In the field",whereOil:"From oil to polymer",whereForest:"From forest to pulp",whereFarm:"On the farm",
-rawH:"{g} g of {blend}",rawLede:"Growing or making this fibre releases {kg} and uses {L} of water.",rawLedeSyn:"Growing or making this fibre releases {kg} and uses {L} of water, and the plastic part will shed microfibres every wash.",
+rawH:"{g} g of {blend}",rawLede:"Growing or making this fibre releases {kg} and uses {L} of water.",rawLedeSyn:"Growing or making this fibre releases {kg} and uses {L} of water, and the synthetic part will shed microfibres every wash.",
 rawPanelH:"Same garment, different fibre",rawSub:"Swap the main fibre ({p}% of the garment) and see the whole tag change.",
-millWhere:"Spinning, weaving, dyeing and sewing",millLede:"Turning fibre into a finished garment adds {kg}, usually the biggest part of its footprint. The electricity there emits {g} g CO₂e per kWh, against a world average of {ref}.",
+millWhere:"Spinning, weaving, dyeing and sewing",millLede:"Turning fibre into a finished garment adds {kg}, usually the biggest part of its footprint. The power grid there has a carbon intensity of {g} g CO₂e/kWh, against a world average of {ref}.",
 millPanelH:"Where it was made",millSub:"Most of the energy here is electricity, so the country’s power grid changes the number.",
 frWhere:"Shipping to Europe",frH_sea:"{km} km by container ship",frH_air:"{km} km by air freight",frH_road:"{km} km by truck",
-frLede:"The trip to a European shop adds {kg}, {share} of its whole life.",lt1:"less than 1%",
+frLede:"The trip to a European shop adds {kg}, {share} of its whole life-cycle footprint.",lt1:"less than 1%",
 frPanelH:"How it travelled",frSub:"Distances are typical routes from the factory to a European city.",
 M_sea:"Container ship",M_air:"Air freight",M_road:"Truck",noRoute:"No overland route",
 frNote:"Flying it would release about {x} times as much freight CO₂ as shipping it. Express delivery from far away is mostly air.",
@@ -544,8 +547,8 @@ useLede:"Washing it over its life adds {kg} and {L} of water.",useLedeDry:"Washi
 usePanelH:"How you wash it",washedAfter:"Washed after",wpw1:"each wear",wpw3:"3 wears",wpw5:"5 wears",dryer:"Tumble dryer",tempAria:"Wash temperature",
 fWater:"water over its life",fMpWash:"microfibres shed per wash",fMpLife:"over its life",fNoMp:"plastic microfibres: no synthetic fibre",
 eolWhere:"After the last wear",eolHmix:"Like most clothes in Europe",eolMix:"About half goes to landfill, 40% is burned and 11% is recycled. ",
-eolLede:"That adds {kg}.",eolLedeSyn:"That adds {kg}. Burning the plastic part releases its fossil carbon.",
-eolPanelH:"Where it ends up",eolSub:"No route gets credit for a second owner or for fibre saved, so these figures only count the handling.",
+eolLede:"That adds {kg}.",eolLedeSyn:"That adds {kg}. Incinerating the synthetic part releases its fossil carbon.",
+eolPanelH:"Where it ends up",eolSub:"No route gets a credit for a second owner or for avoided virgin fibre, so these figures only count collection and treatment.",
 E_mix:"Typical EU mix",E_landfill:"Landfill",E_incin:"Incineration",E_recycle:"Recycling",E_resale:"Resale or donation",
 endWhere:"The whole life",endH:"{kg} CO₂e, about {km} km in a petrol car",
 leverBest:"The biggest single saving: {what} would cut {kg} kg ({p}%). ",leverFib:"switching the main fibre to {f}",leverCtry:"making it in {c}",leverSea:"shipping it instead of flying",
@@ -553,7 +556,7 @@ leverLow:"This is already close to the lowest version of this garment. ",leverWe
 again:"Follow another garment",readOwn:"Read your own label",openCalc:"Open the full calculator",
 endNote:"Figures use the same factors as the calculator on The Honest Tag (Data & Assumptions page). Freight uses typical route distances, so it can differ slightly from the full calculator.",
 noChange:"no change",tagAria:"Honest tag",tagH:"Environmental data",
-R_raw:"Raw materials",R_yarn:"Yarn & fabric",R_wet:"Dyeing & finishing",R_asm:"Sewing & packing",R_fr:"Freight",R_use:"Washing",R_eol:"End of life",
+R_raw:"Raw materials",R_yarn:"Yarn & fabric formation",R_wet:"Wet processing",R_asm:"Assembly & packaging",R_fr:"Freight",R_use:"Use phase",R_eol:"End of life",
 water:"litres of water",mp:"microfibres per wash",yourG:"Your garment",waiting:"Waiting for the label",
 footStart:"The tag fills in as you follow the garment.",footSoFar:"So far: the stages you have passed.",footAll:"Whole life, cradle to grave · {n} wears · {x} kg per wear",
 show:"Show tag",hide:"Hide tag",
@@ -562,10 +565,10 @@ F_cotton:"Cotton",F_rcotton:"Recycled cotton",F_ocotton:"Organic cotton",F_poly:
 C_bangladesh:"Bangladesh",C_china:"China",C_india:"India",C_vietnam:"Vietnam",C_turkey:"Turkey",C_italy:"Italy",C_portugal:"Portugal",
 lower:true},
 it:{
-title:"The Honest Tag – Segui un capo",tabFollow:"Segui un capo",tabRead:"Leggi l’etichetta",tabCalc:"Calcolatore",langAria:"Lingua",
-h0:"Segui un capo, dal campo al cassonetto.",p0:"Scegline uno e scorri verso il basso. A ogni tappa puoi cambiare una scelta e vedere cambiare la sua etichetta onesta.",
+termCG:"dalla culla alla tomba",title:"The Honest Tag – Segui un capo",tabFollow:"Segui un capo",tabRead:"Leggi l’etichetta",tabCalc:"Calcolatore",langAria:"Lingua",
+h0:"Crea la tua Honest Tag, cradle to grave.",p0:"Scegli un capo e scorri verso il basso. A ogni tappa puoi cambiare una scelta e vedere cambiare la sua etichetta onesta.",
 holding:"Ne hai uno in mano? {link} e segui quel capo.",holdingLink:"Leggi la sua etichetta",
-h1:"Leggi l’etichetta che hai in mano.",p1:"Copia quello che c’è scritto sull’etichetta di composizione. Seguiremo quel capo dal campo al cassonetto e scriveremo la sua etichetta onesta passo dopo passo.",
+h1:"Leggi l’etichetta che hai in mano.",p1:"Copia quello che c’è scritto sull’etichetta di composizione. Seguiremo quel capo dalla culla alla tomba e scriveremo la sua etichetta onesta passo dopo passo.",
 careLabel:"Cosa dice l’etichetta?",placeholder:"60% cotone, 40% poliestere\nProdotto in Bangladesh",
 careHint:"Le fibre con le percentuali e il paese dopo «Made in». Funziona in italiano, inglese, spagnolo o tedesco.",
 examplesAria:"Etichette di esempio",
@@ -574,44 +577,44 @@ whatKind:"Che tipo di capo è?",go:"Segui questo capo",goEmpty:"Scrivi un’etic
 madeIn:"Prodotto in {c}",countryGuess:"Paese non trovato, uso {c}",unknown:"Non riconosciuto: {x}",unknownCountry:"«{x}» non è ancora nell’elenco.",
 scaledUnknown:"Le fibre non riconosciute sono escluse e il resto è riportato al 100%.",scaled:"Le percentuali non arrivavano a 100, quindi sono state riproporzionate.",fromLabel:"Dalla tua etichetta",
 whereField:"Nel campo",whereOil:"Dal petrolio al polimero",whereForest:"Dalla foresta alla cellulosa",whereFarm:"In fattoria",
-rawH:"{g} g di {blend}",rawLede:"Coltivare o produrre questa fibra rilascia {kg} e usa {L} di acqua.",rawLedeSyn:"Coltivare o produrre questa fibra rilascia {kg} e usa {L} di acqua, e la parte in plastica rilascerà microfibre a ogni lavaggio.",
+rawH:"{g} g di {blend}",rawLede:"Coltivare o produrre questa fibra genera {kg} e richiede {L} di acqua.",rawLedeSyn:"Coltivare o produrre questa fibra genera {kg} e richiede {L} di acqua, e la parte sintetica rilascerà microfibre a ogni lavaggio.",
 rawPanelH:"Stesso capo, fibra diversa",rawSub:"Cambia la fibra principale ({p}% del capo) e guarda cambiare tutta l’etichetta.",
-millWhere:"Filatura, tessitura, tintura e cucitura",millLede:"Trasformare la fibra in un capo finito aggiunge {kg}, di solito la parte più grande della sua impronta. Lì l’elettricità emette {g} g CO₂e per kWh, contro una media mondiale di {ref}.",
+millWhere:"Filatura, tessitura, tintura e cucitura",millLede:"Trasformare la fibra in un capo finito aggiunge {kg}, di solito la parte più grande della sua impronta. Lì la rete elettrica ha un’intensità di carbonio di {g} g CO₂e/kWh, contro una media mondiale di {ref}.",
 millPanelH:"Dove è stato prodotto",millSub:"Qui la maggior parte dell’energia è elettrica, quindi la rete elettrica del paese cambia il risultato.",
 frWhere:"La spedizione verso l’Europa",frH_sea:"{km} km in nave portacontainer",frH_air:"{km} km in aereo",frH_road:"{km} km in camion",
-frLede:"Il viaggio fino a un negozio europeo aggiunge {kg}, {share} della sua intera vita.",lt1:"meno dell’1%",
+frLede:"Il viaggio fino a un negozio europeo aggiunge {kg}, {share} dell’impronta sull’intero ciclo di vita.",lt1:"meno dell’1%",
 frPanelH:"Come ha viaggiato",frSub:"Le distanze sono rotte tipiche dalla fabbrica a una città europea.",
 M_sea:"Nave portacontainer",M_air:"Aereo",M_road:"Camion",noRoute:"Nessuna rotta via terra",
 frNote:"In aereo il trasporto emetterebbe circa {x} volte la CO₂ della nave. Le consegne espresse da lontano viaggiano per lo più in aereo.",
-wearWhere:"Il tuo armadio",wearH:"Indossato {n} volte",wearLede:"In fabbrica non cambia nulla, ma ogni utilizzo in più distribuisce l’impronta.",
+wearWhere:"Il tuo armadio",wearH:"Indossato {n} volte",wearLede:"In fabbrica non cambia nulla, ma ogni utilizzo in più ripartisce l’impronta su più giorni.",
 wearPanelH:"Quante volte lo indosserai?",wearsO:"{n} utilizzi",wearsAria:"Numero di utilizzi",perwearL:"kg CO₂e per utilizzo",perwear5L:"se indossato solo 5 volte",curveAria:"L’impronta per utilizzo scende quanto più spesso si indossa il capo",
 useWhere:"La lavatrice",useH:"{n} lavaggi a {t} °C",useHdry:"{n} lavaggi a {t} °C, con asciugatrice",
 useLede:"Lavarlo per tutta la sua vita aggiunge {kg} e {L} di acqua.",useLedeDry:"Lavarlo per tutta la sua vita aggiunge {kg} e {L} di acqua. L’asciugatrice consuma più energia del lavaggio stesso.",
 usePanelH:"Come lo lavi",washedAfter:"Lavato dopo",wpw1:"ogni utilizzo",wpw3:"3 utilizzi",wpw5:"5 utilizzi",dryer:"Asciugatrice",tempAria:"Temperatura di lavaggio",
 fWater:"acqua in tutta la sua vita",fMpWash:"microfibre rilasciate per lavaggio",fMpLife:"in tutta la sua vita",fNoMp:"microfibre di plastica: nessuna fibra sintetica",
 eolWhere:"Dopo l’ultimo utilizzo",eolHmix:"Come la maggior parte dei vestiti in Europa",eolMix:"Circa metà finisce in discarica, il 40% viene bruciato e l’11% riciclato. ",
-eolLede:"Questo aggiunge {kg}.",eolLedeSyn:"Questo aggiunge {kg}. Bruciare la parte in plastica libera il suo carbonio fossile.",
-eolPanelH:"Dove finisce",eolSub:"Nessun percorso riceve crediti per un secondo proprietario o per la fibra risparmiata: queste cifre contano solo la gestione.",
+eolLede:"Questo aggiunge {kg}.",eolLedeSyn:"Questo aggiunge {kg}. L’incenerimento della parte sintetica libera il suo carbonio fossile.",
+eolPanelH:"Dove finisce",eolSub:"Nessuno scenario riceve crediti per un secondo proprietario o per la fibra vergine evitata: queste cifre contano solo raccolta e trattamento.",
 E_mix:"Mix tipico UE",E_landfill:"Discarica",E_incin:"Incenerimento",E_recycle:"Riciclo",E_resale:"Rivendita o donazione",
 endWhere:"Tutta la vita",endH:"{kg} CO₂e, circa {km} km in un’auto a benzina",
 leverBest:"Il risparmio più grande: {what} ridurrebbe l’impronta di {kg} kg ({p}%). ",leverFib:"passare a {f} come fibra principale",leverCtry:"produrlo in {c}",leverSea:"spedirlo in nave invece che in aereo",
-leverLow:"È già vicino alla versione più leggera di questo capo. ",leverWear:"E quello gratuito: indossarlo {n2} volte invece di {n} dimezza la sua impronta per utilizzo, a {x} kg.",
+leverLow:"È già vicino alla versione più leggera di questo capo. ",leverWear:"E il risparmio a costo zero: indossarlo {n2} volte invece di {n} dimezza la sua impronta per utilizzo, a {x} kg.",
 again:"Segui un altro capo",readOwn:"Leggi la tua etichetta",openCalc:"Apri il calcolatore completo",
 endNote:"Le cifre usano gli stessi fattori del calcolatore di The Honest Tag (pagina Metodologia). Il trasporto usa distanze di rotte tipiche, quindi può differire leggermente dal calcolatore completo.",
 noChange:"nessuna variazione",tagAria:"Etichetta onesta",tagH:"Valori ambientali",
-R_raw:"Materie prime",R_yarn:"Filato e tessuto",R_wet:"Tintura e finissaggio",R_asm:"Cucitura e imballaggio",R_fr:"Trasporto",R_use:"Lavaggi",R_eol:"Fine vita",
+R_raw:"Materie prime",R_yarn:"Filatura e tessitura",R_wet:"Tintura e finissaggio",R_asm:"Confezione e imballaggio",R_fr:"Trasporto",R_use:"Fase d’uso",R_eol:"Fine vita",
 water:"litri di acqua",mp:"microfibre per lavaggio",yourG:"Il tuo capo",waiting:"In attesa dell’etichetta",
-footStart:"L’etichetta si compila mentre segui il capo.",footSoFar:"Finora: le fasi che hai superato.",footAll:"Intera vita, dalla culla alla tomba · {n} utilizzi · {x} kg per utilizzo",
+footStart:"L’etichetta si compila mentre segui il capo.",footSoFar:"Finora: le fasi che hai superato.",footAll:"Intera vita, cradle to grave · {n} utilizzi · {x} kg per utilizzo",
 show:"Mostra etichetta",hide:"Nascondi etichetta",
 G_tshirt:"T-shirt",G_jeans:"Jeans",G_hoodie:"Felpa",G_leggings:"Leggings",G_shirt:"Camicia",G_sweater:"Maglione",
 F_cotton:"Cotone",F_rcotton:"Cotone riciclato",F_ocotton:"Cotone biologico",F_poly:"Poliestere",F_rpoly:"Poliestere riciclato",F_viscose:"Viscosa",F_lyocell:"Lyocell (Tencel)",F_linen:"Lino",F_wool:"Lana",F_nylon:"Nylon",F_elastane:"Elastan",
 C_bangladesh:"Bangladesh",C_china:"Cina",C_india:"India",C_vietnam:"Vietnam",C_turkey:"Turchia",C_italy:"Italia",C_portugal:"Portogallo",
 lower:true},
 es:{
-title:"The Honest Tag – Sigue una prenda",tabFollow:"Sigue una prenda",tabRead:"Lee tu etiqueta",tabCalc:"Calculadora",langAria:"Idioma",
-h0:"Sigue una prenda, del campo a la basura.",p0:"Elige una y desplázate hacia abajo. En cada parada puedes cambiar una decisión y ver cómo cambia su etiqueta honesta.",
+termCG:"de la cuna a la tumba",title:"The Honest Tag – Sigue una prenda",tabFollow:"Sigue una prenda",tabRead:"Lee tu etiqueta",tabCalc:"Calculadora",langAria:"Idioma",
+h0:"Crea tu Honest Tag, cradle to grave.",p0:"Elige una prenda y desplázate hacia abajo. En cada parada puedes cambiar una decisión y ver cómo cambia su etiqueta honesta.",
 holding:"¿Tienes una en la mano? {link} y sigue esa prenda.",holdingLink:"Lee su etiqueta",
-h1:"Lee la etiqueta que tienes en la mano.",p1:"Copia lo que dice la etiqueta de composición. Seguiremos esa prenda del campo a la basura y escribiremos su etiqueta honesta sobre la marcha.",
+h1:"Lee la etiqueta que tienes en la mano.",p1:"Copia lo que dice la etiqueta de composición. Seguiremos esa prenda de la cuna a la tumba y escribiremos su etiqueta honesta sobre la marcha.",
 careLabel:"¿Qué dice la etiqueta?",placeholder:"60% algodón, 40% poliéster\nHecho en Bangladés",
 careHint:"Las fibras con sus porcentajes y el país después de «Made in». Funciona en español, inglés, italiano o alemán.",
 examplesAria:"Etiquetas de ejemplo",
@@ -620,12 +623,12 @@ whatKind:"¿Qué tipo de prenda es?",go:"Seguir esta prenda",goEmpty:"Escribe un
 madeIn:"Hecho en {c}",countryGuess:"País no encontrado, se usa {c}",unknown:"No reconocido: {x}",unknownCountry:"«{x}» aún no está en la lista.",
 scaledUnknown:"Las fibras no reconocidas se dejan fuera y el resto se ajusta al 100%.",scaled:"Los porcentajes no sumaban 100, así que se han ajustado.",fromLabel:"De tu etiqueta",
 whereField:"En el campo",whereOil:"Del petróleo al polímero",whereForest:"Del bosque a la pulpa",whereFarm:"En la granja",
-rawH:"{g} g de {blend}",rawLede:"Cultivar o fabricar esta fibra emite {kg} y usa {L} de agua.",rawLedeSyn:"Cultivar o fabricar esta fibra emite {kg} y usa {L} de agua, y la parte de plástico soltará microfibras en cada lavado.",
+rawH:"{g} g de {blend}",rawLede:"Cultivar o fabricar esta fibra emite {kg} y usa {L} de agua.",rawLedeSyn:"Cultivar o fabricar esta fibra emite {kg} y usa {L} de agua, y la parte sintética soltará microfibras en cada lavado.",
 rawPanelH:"La misma prenda, otra fibra",rawSub:"Cambia la fibra principal ({p}% de la prenda) y mira cómo cambia toda la etiqueta.",
-millWhere:"Hilatura, tejido, tintura y confección",millLede:"Convertir la fibra en una prenda terminada añade {kg}, normalmente la mayor parte de su huella. Allí la electricidad emite {g} g CO₂e por kWh, frente a una media mundial de {ref}.",
+millWhere:"Hilatura, tejido, tintura y confección",millLede:"Convertir la fibra en una prenda terminada añade {kg}, normalmente la mayor parte de su huella. Allí la red eléctrica tiene una intensidad de carbono de {g} g CO₂e/kWh, frente a una media mundial de {ref}.",
 millPanelH:"Dónde se fabricó",millSub:"Aquí la mayor parte de la energía es electricidad, así que la red eléctrica del país cambia el resultado.",
 frWhere:"El envío a Europa",frH_sea:"{km} km en buque portacontenedores",frH_air:"{km} km en avión",frH_road:"{km} km en camión",
-frLede:"El viaje hasta una tienda europea añade {kg}, {share} de toda su vida.",lt1:"menos del 1%",
+frLede:"El viaje hasta una tienda europea añade {kg}, {share} de la huella de todo su ciclo de vida.",lt1:"menos del 1%",
 frPanelH:"Cómo viajó",frSub:"Las distancias son rutas típicas desde la fábrica hasta una ciudad europea.",
 M_sea:"Buque portacontenedores",M_air:"Avión",M_road:"Camión",noRoute:"Sin ruta terrestre",
 frNote:"En avión, el transporte emitiría unas {x} veces más CO₂ que en barco. Los envíos exprés desde lejos viajan casi siempre en avión.",
@@ -636,28 +639,28 @@ useLede:"Lavarla durante toda su vida añade {kg} y {L} de agua.",useLedeDry:"La
 usePanelH:"Cómo la lavas",washedAfter:"Se lava tras",wpw1:"cada uso",wpw3:"3 usos",wpw5:"5 usos",dryer:"Secadora",tempAria:"Temperatura de lavado",
 fWater:"agua a lo largo de su vida",fMpWash:"microfibras por lavado",fMpLife:"a lo largo de su vida",fNoMp:"microfibras de plástico: sin fibra sintética",
 eolWhere:"Después del último uso",eolHmix:"Como la mayoría de la ropa en Europa",eolMix:"Cerca de la mitad acaba en vertedero, el 40% se quema y el 11% se recicla. ",
-eolLede:"Eso añade {kg}.",eolLedeSyn:"Eso añade {kg}. Quemar la parte de plástico libera su carbono fósil.",
-eolPanelH:"Dónde termina",eolSub:"Ninguna ruta recibe crédito por un segundo dueño ni por la fibra ahorrada, así que estas cifras solo cuentan la gestión.",
-E_mix:"Mezcla típica UE",E_landfill:"Vertedero",E_incin:"Incineración",E_recycle:"Reciclaje",E_resale:"Reventa o donación",
+eolLede:"Eso añade {kg}.",eolLedeSyn:"Eso añade {kg}. Incinerar la parte sintética libera su carbono fósil.",
+eolPanelH:"Dónde termina",eolSub:"Ningún escenario recibe crédito por un segundo dueño ni por la fibra virgen evitada, así que estas cifras solo cuentan la recogida y el tratamiento.",
+E_mix:"Mix típico de la UE",E_landfill:"Vertedero",E_incin:"Incineración",E_recycle:"Reciclaje",E_resale:"Reventa o donación",
 endWhere:"Toda su vida",endH:"{kg} CO₂e, unos {km} km en un coche de gasolina",
 leverBest:"El mayor ahorro posible: {what} reduciría la huella en {kg} kg ({p}%). ",leverFib:"cambiar la fibra principal a {f}",leverCtry:"fabricarla en {c}",leverSea:"enviarla en barco en vez de en avión",
 leverLow:"Ya está cerca de la versión más ligera de esta prenda. ",leverWear:"Y el que no cuesta nada: usarla {n2} veces en lugar de {n} reduce a la mitad su huella por uso, a {x} kg.",
 again:"Seguir otra prenda",readOwn:"Leer tu etiqueta",openCalc:"Abrir la calculadora completa",
 endNote:"Las cifras usan los mismos factores que la calculadora de The Honest Tag (página Metodología). El transporte usa distancias de rutas típicas, así que puede diferir un poco de la calculadora completa.",
 noChange:"sin cambios",tagAria:"Etiqueta honesta",tagH:"Datos ambientales",
-R_raw:"Materias primas",R_yarn:"Hilo y tejido",R_wet:"Tintura y acabado",R_asm:"Confección y embalaje",R_fr:"Transporte",R_use:"Lavados",R_eol:"Fin de vida",
+R_raw:"Materias primas",R_yarn:"Hilatura y tejeduría",R_wet:"Procesos húmedos",R_asm:"Confección y embalaje",R_fr:"Transporte",R_use:"Fase de uso",R_eol:"Fin de vida",
 water:"litros de agua",mp:"microfibras por lavado",yourG:"Tu prenda",waiting:"Esperando la etiqueta",
-footStart:"La etiqueta se rellena a medida que sigues la prenda.",footSoFar:"Hasta ahora: las fases que has pasado.",footAll:"Toda la vida, de la cuna a la tumba · {n} usos · {x} kg por uso",
+footStart:"La etiqueta se rellena a medida que sigues la prenda.",footSoFar:"Hasta ahora: las fases que has pasado.",footAll:"Toda la vida, cradle to grave · {n} usos · {x} kg por uso",
 show:"Ver etiqueta",hide:"Ocultar etiqueta",
-G_tshirt:"Camiseta",G_jeans:"Vaqueros",G_hoodie:"Sudadera",G_leggings:"Leggings",G_shirt:"Camisa",G_sweater:"Jersey",
-F_cotton:"Algodón",F_rcotton:"Algodón reciclado",F_ocotton:"Algodón orgánico",F_poly:"Poliéster",F_rpoly:"Poliéster reciclado",F_viscose:"Viscosa",F_lyocell:"Lyocell (Tencel)",F_linen:"Lino",F_wool:"Lana",F_nylon:"Nailon",F_elastane:"Elastano",
+G_tshirt:"Camiseta",G_jeans:"Vaqueros",G_hoodie:"Sudadera",G_leggings:"Leggings",G_shirt:"Camisa",G_sweater:"Suéter",
+F_cotton:"Algodón",F_rcotton:"Algodón reciclado",F_ocotton:"Algodón ecológico",F_poly:"Poliéster",F_rpoly:"Poliéster reciclado",F_viscose:"Viscosa",F_lyocell:"Lyocell (Tencel)",F_linen:"Lino",F_wool:"Lana",F_nylon:"Nailon",F_elastane:"Elastano",
 C_bangladesh:"Bangladés",C_china:"China",C_india:"India",C_vietnam:"Vietnam",C_turkey:"Turquía",C_italy:"Italia",C_portugal:"Portugal",
 lower:true},
 de:{
-title:"The Honest Tag – Kleidungsstück verfolgen",tabFollow:"Kleidung verfolgen",tabRead:"Etikett lesen",tabCalc:"Rechner",langAria:"Sprache",
-h0:"Folge einem Kleidungsstück vom Feld bis in die Tonne.",p0:"Wähle eines aus und scrolle nach unten. An jeder Station kannst du eine Entscheidung ändern und sehen, wie sich sein ehrliches Etikett verändert.",
+termCG:"von der Wiege bis zur Bahre",title:"The Honest Tag – Kleidungsstück verfolgen",tabFollow:"Kleidung verfolgen",tabRead:"Etikett lesen",tabCalc:"Rechner",langAria:"Sprache",
+h0:"Erstelle dein Honest Tag, cradle to grave.",p0:"Wähle ein Kleidungsstück und scrolle nach unten. An jeder Station kannst du eine Entscheidung ändern und sehen, wie sich sein ehrliches Etikett verändert.",
 holding:"Hast du eines in der Hand? {link} und folge diesem Kleidungsstück.",holdingLink:"Lies sein Etikett",
-h1:"Lies das Etikett in deiner Hand.",p1:"Schreib ab, was auf dem Pflegeetikett steht. Wir folgen diesem Kleidungsstück vom Feld bis in die Tonne und schreiben dabei sein ehrliches Etikett.",
+h1:"Lies das Etikett in deiner Hand.",p1:"Schreib ab, was auf dem Pflegeetikett steht. Wir folgen diesem Kleidungsstück von der Wiege bis zur Bahre und schreiben dabei sein ehrliches Etikett.",
 careLabel:"Was steht auf dem Etikett?",placeholder:"60% Baumwolle, 40% Polyester\nHergestellt in Bangladesch",
 careHint:"Fasern mit Prozentangaben und das Land nach „Made in“. Deutsch, Englisch, Italienisch oder Spanisch funktionieren.",
 examplesAria:"Beispieletiketten",
@@ -666,12 +669,12 @@ whatKind:"Was für ein Kleidungsstück ist es?",go:"Diesem Kleidungsstück folge
 madeIn:"Hergestellt in {c}",countryGuess:"Land nicht gefunden, verwendet wird {c}",unknown:"Nicht erkannt: {x}",unknownCountry:"„{x}“ ist noch nicht in der Liste.",
 scaledUnknown:"Nicht erkannte Fasern werden weggelassen, der Rest wird auf 100% hochgerechnet.",scaled:"Die Prozentangaben ergaben nicht 100, daher wurden sie angepasst.",fromLabel:"Von deinem Etikett",
 whereField:"Auf dem Feld",whereOil:"Vom Erdöl zum Polymer",whereForest:"Vom Wald zum Zellstoff",whereFarm:"Auf dem Hof",
-rawH:"{g} g {blend}",rawLede:"Anbau oder Herstellung dieser Faser verursachen {kg} und verbrauchen {L} Wasser.",rawLedeSyn:"Anbau oder Herstellung dieser Faser verursachen {kg} und verbrauchen {L} Wasser, und der Kunststoffanteil gibt bei jeder Wäsche Mikrofasern ab.",
+rawH:"{g} g {blend}",rawLede:"Anbau oder Herstellung dieser Faser verursachen {kg} und verbrauchen {L} Wasser.",rawLedeSyn:"Anbau oder Herstellung dieser Faser verursachen {kg} und verbrauchen {L} Wasser, und der synthetische Anteil gibt bei jeder Wäsche Mikrofasern ab.",
 rawPanelH:"Gleiches Kleidungsstück, andere Faser",rawSub:"Tausche die Hauptfaser ({p}% des Kleidungsstücks) und sieh, wie sich das ganze Etikett ändert.",
-millWhere:"Spinnen, Weben, Färben und Nähen",millLede:"Aus der Faser ein fertiges Kleidungsstück zu machen, verursacht {kg} – meist der größte Teil seines Fußabdrucks. Der Strom dort verursacht {g} g CO₂e pro kWh, gegenüber einem weltweiten Durchschnitt von {ref}.",
+millWhere:"Spinnen, Weben, Färben und Nähen",millLede:"Aus der Faser ein fertiges Kleidungsstück zu machen, verursacht {kg} – meist der größte Teil seines Fußabdrucks. Das Stromnetz dort hat eine CO₂-Intensität von {g} g CO₂e/kWh, gegenüber einem weltweiten Durchschnitt von {ref}.",
 millPanelH:"Wo es hergestellt wurde",millSub:"Hier ist der Großteil der Energie Strom, daher verändert das Stromnetz des Landes das Ergebnis.",
 frWhere:"Der Transport nach Europa",frH_sea:"{km} km per Containerschiff",frH_air:"{km} km per Luftfracht",frH_road:"{km} km per Lkw",
-frLede:"Der Weg bis in ein europäisches Geschäft verursacht {kg}, {share} seines gesamten Lebenszyklus.",lt1:"weniger als 1%",
+frLede:"Der Weg bis in ein europäisches Geschäft verursacht {kg}, {share} des Fußabdrucks über den gesamten Lebenszyklus.",lt1:"weniger als 1%",
 frPanelH:"Wie es gereist ist",frSub:"Die Entfernungen sind typische Routen von der Fabrik in eine europäische Stadt.",
 M_sea:"Containerschiff",M_air:"Luftfracht",M_road:"Lkw",noRoute:"Keine Landroute",
 frNote:"Per Flugzeug würde der Transport etwa {x}-mal so viel CO₂ verursachen wie per Schiff. Expresslieferungen aus der Ferne kommen meist per Flugzeug.",
@@ -682,8 +685,8 @@ useLede:"Das Waschen über die Lebensdauer verursacht {kg} und verbraucht {L} Wa
 usePanelH:"Wie du es wäschst",washedAfter:"Gewaschen nach",wpw1:"jedem Tragen",wpw3:"3-mal Tragen",wpw5:"5-mal Tragen",dryer:"Wäschetrockner",tempAria:"Waschtemperatur",
 fWater:"Wasser über die Lebensdauer",fMpWash:"Mikrofasern pro Wäsche",fMpLife:"über die Lebensdauer",fNoMp:"Mikroplastik-Fasern: keine Kunstfaser",
 eolWhere:"Nach dem letzten Tragen",eolHmix:"Wie die meiste Kleidung in Europa",eolMix:"Etwa die Hälfte landet auf der Deponie, 40% werden verbrannt und 11% recycelt. ",
-eolLede:"Das verursacht {kg}.",eolLedeSyn:"Das verursacht {kg}. Beim Verbrennen setzt der Kunststoffanteil seinen fossilen Kohlenstoff frei.",
-eolPanelH:"Wo es landet",eolSub:"Kein Weg erhält eine Gutschrift für einen zweiten Besitzer oder eingesparte Fasern; diese Werte zählen nur die Entsorgung.",
+eolLede:"Das verursacht {kg}.",eolLedeSyn:"Das verursacht {kg}. Bei der Verbrennung setzt der synthetische Anteil seinen fossilen Kohlenstoff frei.",
+eolPanelH:"Wo es landet",eolSub:"Kein Weg erhält eine Gutschrift für einen zweiten Besitzer oder vermiedene Neufasern; diese Werte zählen nur Sammlung und Behandlung.",
 E_mix:"Typischer EU-Mix",E_landfill:"Deponie",E_incin:"Verbrennung",E_recycle:"Recycling",E_resale:"Wiederverkauf oder Spende",
 endWhere:"Das ganze Leben",endH:"{kg} CO₂e, etwa {km} km mit einem Benzin-Pkw",
 leverBest:"Die größte einzelne Einsparung bringt {what}: {kg} kg weniger ({p}%). ",leverFib:"ein Wechsel der Hauptfaser auf „{f}“",leverCtry:"die Herstellung in {c}",leverSea:"der Versand per Schiff statt per Flugzeug",
@@ -691,9 +694,9 @@ leverLow:"Das ist schon nahe an der sparsamsten Version dieses Kleidungsstücks.
 again:"Einem anderen Kleidungsstück folgen",readOwn:"Eigenes Etikett lesen",openCalc:"Ausführlichen Rechner öffnen",
 endNote:"Die Werte nutzen dieselben Faktoren wie der Rechner von The Honest Tag (Seite Daten & Annahmen). Der Transport nutzt typische Routenentfernungen und kann daher leicht vom ausführlichen Rechner abweichen.",
 noChange:"keine Änderung",tagAria:"Ehrliches Etikett",tagH:"Umweltdaten",
-R_raw:"Rohstoffe",R_yarn:"Garn & Stoff",R_wet:"Färben & Ausrüsten",R_asm:"Nähen & Verpacken",R_fr:"Fracht",R_use:"Waschen",R_eol:"Lebensende",
+R_raw:"Rohstoffe",R_yarn:"Garn- und Stoffherstellung",R_wet:"Nassveredelung",R_asm:"Konfektion und Verpackung",R_fr:"Fracht",R_use:"Nutzungsphase",R_eol:"Lebensende",
 water:"Liter Wasser",mp:"Mikrofasern pro Wäsche",yourG:"Dein Kleidungsstück",waiting:"Wartet auf das Etikett",
-footStart:"Das Etikett füllt sich, während du dem Kleidungsstück folgst.",footSoFar:"Bisher: die Phasen, die du durchlaufen hast.",footAll:"Gesamtes Leben, von der Wiege bis zur Bahre · {n}-mal getragen · {x} kg pro Tragen",
+footStart:"Das Etikett füllt sich, während du dem Kleidungsstück folgst.",footSoFar:"Bisher: die Phasen, die du durchlaufen hast.",footAll:"Gesamtes Leben, cradle to grave · {n}-mal getragen · {x} kg pro Tragen",
 show:"Etikett zeigen",hide:"Etikett ausblenden",
 G_tshirt:"T-Shirt",G_jeans:"Jeans",G_hoodie:"Hoodie",G_leggings:"Leggings",G_shirt:"Hemd",G_sweater:"Pullover",
 F_cotton:"Baumwolle",F_rcotton:"Recycelte Baumwolle",F_ocotton:"Bio-Baumwolle",F_poly:"Polyester",F_rpoly:"Recyceltes Polyester",F_viscose:"Viskose",F_lyocell:"Lyocell (Tencel)",F_linen:"Leinen",F_wool:"Wolle",F_nylon:"Nylon",F_elastane:"Elasthan",
@@ -780,6 +783,7 @@ function applyStatic(){
   document.querySelectorAll("[data-t]").forEach(function(e){e.textContent=t(e.getAttribute("data-t"));});
   document.querySelectorAll("[data-i]").forEach(function(e){var p=e.getAttribute("data-i").split(":");e.setAttribute(p[0],t(p[1]));});
   document.getElementById("tagtext").placeholder=t("placeholder");
+  withTerm(document.getElementById("h0"),t("h0"));
   var h=document.getElementById("holding");h.innerHTML="";var parts=t("holding").split("{link}");
   h.appendChild(document.createTextNode(parts[0]));var b=document.createElement("button");b.type="button";b.className="textlink";b.setAttribute("data-goview","read");b.textContent=t("holdingLink");h.appendChild(b);h.appendChild(document.createTextNode(parts[1]||""));
   var ex=document.getElementById("examples");ex.setAttribute("aria-label",t("examplesAria"));ex.innerHTML="";
@@ -788,6 +792,18 @@ function applyStatic(){
   LANGS.forEach(function(l){var bb=document.createElement("button");bb.type="button";bb.lang=l;bb.textContent=l.toUpperCase();bb.setAttribute("aria-pressed",l===lang?"true":"false");bb.onclick=function(){setLang(l);};L.appendChild(bb);});
   garB.innerHTML="";Object.keys(GAR).forEach(function(k){var bb=document.createElement("button");bb.type="button";bb.textContent=nm("G_",k);bb.dataset.g=k;bb.onclick=function(){garChosen=k;renderHero();};garB.appendChild(bb);});
   document.getElementById("m-lab").textContent=t(tc.classList.contains("open")?"hide":"show");
+}
+// Keep the English LCA term "cradle to grave" and show the translation small, in brackets, after it
+function withTerm(el,text){
+  var ph=lang!=="en"&&JL[lang].termCG,K="cradle to grave";
+  if(!ph||text.indexOf(K)<0){el.textContent=text;return;}
+  var j=text.indexOf(K),i=j+K.length,rest=text.slice(i);if(rest===".")rest="";el.textContent="";
+  if(text.slice(j-5,j)==="from ")j-=5;
+  el.appendChild(document.createTextNode(text.slice(0,j)));
+  var e=document.createElement("span");e.lang="en";e.className="nw";e.textContent=text.slice(j,i);el.appendChild(e);
+  el.appendChild(document.createTextNode(" "));
+  var s=document.createElement("span");s.className="term-en";s.textContent="("+ph+")";el.appendChild(s);
+  el.appendChild(document.createTextNode(rest));
 }
 function setLang(l){
   lang=l;window.htLang=l;try{localStorage.setItem(KEY,l);}catch(e){}
@@ -926,7 +942,7 @@ function renderTag(R,fromChange){
   document.getElementById("m-total").textContent=st.read?f2(tot):"–";
   document.getElementById("t-water").textContent=st.read?fN(reached>=4?R.water:R.water-R.useW):"–";
   document.getElementById("t-mp").textContent=st.read?fN(R.mpWash):"–";
-  document.getElementById("t-foot").textContent=!st.read?t("footStart"):all?t("footAll",{n:st.wears,x:dec((R.total/st.wears).toFixed(2))}):t("footSoFar");
+  withTerm(document.getElementById("t-foot"),!st.read?t("footStart"):all?t("footAll",{n:st.wears,x:dec((R.total/st.wears).toFixed(2))}):t("footSoFar"));
   if(fromChange==="choice"&&last!==null&&Math.abs(tot-last)>=0.005){
     var dd=tot-last;[document.getElementById("t-delta"),document.getElementById("m-delta")].forEach(function(el){el.className="delta num show "+(dd>0?"up":"down");el.textContent=(dd>0?"+":"−")+dec(Math.abs(dd).toFixed(2))+" kg";clearTimeout(el._t);el._t=setTimeout(function(){el.className="delta num";},2600);});
   }
